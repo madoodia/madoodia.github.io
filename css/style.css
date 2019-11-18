@@ -1,0 +1,59 @@
+body {
+    padding: 60px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    background: #aaaaaa;
+    color: black;
+    font-size: 15px;
+    font-family: Tomorrow, serif;
+}
+
+#header {
+    padding: 60px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    background: #aaaaaa;
+    color: black;
+    font-size: 15px;
+    font-family: Tomorrow, serif;
+}
+
+#footer {
+    padding: 60px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    background: #aaaaaa;
+    color: black;
+    font-size: 15px;
+    font-family: Tomorrow, serif;
+}
+
+.projects {
+    width: 65% !important;
+    padding: 0px;
+    margin: 0px !important;
+    text-align: center;
+    /* text-align: justify; */
+    /* text-align-last: center; */
+}
+
+.projectLink {
+    position: relative;
+    width: 242px !important;
+    height: 227px !important;
+    margin: 0 10px 0px 0 !important;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.projectThumb {
+    width: 240px;
+    height: 180px;
+    border: 1px solid black;
+    background-color: gray;
+    background-size: 100%;
+}
