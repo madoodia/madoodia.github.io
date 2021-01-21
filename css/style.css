@@ -67,10 +67,15 @@ body {
   color: rgb(0, 39, 41);
   padding: 1.5rem 1rem;
 }
+
 .demo-icon:hover {
   margin: 10;
   color: #fff64f;
   padding: 1.5rem 1rem;
+}
+
+#construction {
+  color: rgb(0, 39, 41);
 }
 
 /* --------------------------------------- */
