@@ -25,13 +25,14 @@ body {
 }
 
 #footer {
-  padding: 60px;
-  padding-left: 0px;
-  padding-right: 0px;
-  text-align: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
   background: #aaaaaa;
   color: black;
-  font-size: 15px;
+  font-size: 12px;
   font-family: Tomorrow, serif;
 }
 
