@@ -1,59 +1,127 @@
 body {
-    padding: 60px;
-    padding-left: 0px;
-    padding-right: 0px;
-    text-align: center;
-    background: #aaaaaa;
-    color: black;
-    font-size: 15px;
-    font-family: Tomorrow, serif;
+  padding: 60px;
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+  background: #aaaaaa;
+  color: black;
+  font-size: 15px;
+  font-family: Tomorrow, serif;
 }
 
 #header {
-    padding: 60px;
-    padding-left: 0px;
-    padding-right: 0px;
-    text-align: center;
-    background: #aaaaaa;
-    color: black;
-    font-size: 15px;
-    font-family: Tomorrow, serif;
+  padding: 60px;
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+  background: #aaaaaa;
+  color: black;
+  font-size: 15px;
+  font-family: Tomorrow, serif;
 }
 
 #footer {
-    padding: 60px;
-    padding-left: 0px;
-    padding-right: 0px;
-    text-align: center;
-    background: #aaaaaa;
-    color: black;
-    font-size: 15px;
-    font-family: Tomorrow, serif;
+  padding: 60px;
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+  background: #aaaaaa;
+  color: black;
+  font-size: 15px;
+  font-family: Tomorrow, serif;
 }
 
 .projects {
-    width: 65% !important;
-    padding: 0px;
-    margin: 0px !important;
-    text-align: center;
-    /* text-align: justify; */
-    /* text-align-last: center; */
+  width: 65% !important;
+  padding: 0px;
+  margin: 0px !important;
+  text-align: center;
+  /* text-align: justify; */
+  /* text-align-last: center; */
 }
 
 .projectLink {
-    position: relative;
-    width: 242px !important;
-    height: 227px !important;
-    margin: 0 10px 0px 0 !important;
-    text-align: center;
-    display: inline-block;
-    vertical-align: top;
+  position: relative;
+  width: 242px !important;
+  height: 227px !important;
+  margin: 0 10px 0px 0 !important;
+  text-align: center;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .projectThumb {
-    width: 240px;
-    height: 180px;
-    border: 1px solid black;
-    background-color: gray;
-    background-size: 100%;
+  width: 240px;
+  height: 180px;
+  border: 1px solid black;
+  background-color: rgb(163, 163, 163);
+  background-size: 100%;
+}
+
+.demo-icon {
+  margin: 10;
+  color: rgb(0, 39, 41);
+  padding: 1.5rem 1rem;
+}
+.demo-icon:hover {
+  margin: 10;
+  color: rgb(255, 255, 255);
+  padding: 1.5rem 1rem;
+}
+
+/* --------------------------------------- */
+/* Google Material Design Icon */
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-24 {
+  font-size: 24px;
+}
+.material-icons.md-36 {
+  font-size: 36px;
+}
+.material-icons.md-48 {
+  font-size: 48px;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
 }
