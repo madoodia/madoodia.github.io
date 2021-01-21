@@ -9,7 +9,7 @@ body {
   font-family: Tomorrow, serif;
 }
 
-#header {
+header {
   padding: 60px;
   padding-left: 0px;
   padding-right: 0px;
@@ -24,7 +24,7 @@ body {
   color: rgb(0, 39, 41);
 }
 
-#footer {
+footer {
   position: absolute;
   bottom: 0;
   left: 0;
