@@ -20,6 +20,10 @@ body {
   font-family: Tomorrow, serif;
 }
 
+#website-name {
+  color: rgb(0, 39, 41);
+}
+
 #footer {
   padding: 60px;
   padding-left: 0px;
@@ -65,7 +69,7 @@ body {
 }
 .demo-icon:hover {
   margin: 10;
-  color: rgb(255, 255, 255);
+  color: #fff64f;
   padding: 1.5rem 1rem;
 }
 
