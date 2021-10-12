@@ -3,8 +3,8 @@ body {
   padding-left: 0px;
   padding-right: 0px;
   text-align: center;
-  background: #aaaaaa;
-  color: black;
+  background: #344955;
+  color: rgb(253, 253, 253);
   font-size: 15px;
   font-family: Tomorrow, serif;
 }
@@ -14,14 +14,14 @@ header {
   padding-left: 0px;
   padding-right: 0px;
   text-align: center;
-  background: #aaaaaa;
-  color: black;
+  background: #344955;
+  color: rgb(255, 255, 255);
   font-size: 15px;
   font-family: Tomorrow, serif;
 }
 
 #website-name {
-  color: rgb(0, 39, 41);
+  color: #f9aa33;
 }
 
 footer {
@@ -30,8 +30,8 @@ footer {
   left: 0;
   right: 0;
   height: 60px;
-  background: #aaaaaa;
-  color: black;
+  background: #344955;
+  color: rgb(255, 255, 255);
   font-size: 12px;
   font-family: Tomorrow, serif;
 }
@@ -58,25 +58,25 @@ footer {
 .projectThumb {
   width: 240px;
   height: 180px;
-  border: 1px solid black;
-  background-color: rgb(163, 163, 163);
+  border: 1px solid rgb(255, 255, 255);
+  background-color: #344955;
   background-size: 100%;
 }
 
 .demo-icon {
   margin: 10;
-  color: rgb(0, 39, 41);
+  color: #f9aa33;
   padding: 1.5rem 1rem;
 }
 
 .demo-icon:hover {
   margin: 10;
-  color: #fff64f;
+  color: #ffffff;
   padding: 1.5rem 1rem;
 }
 
 #construction {
-  color: rgb(0, 39, 41);
+  color: #f9aa33;
 }
 
 /* --------------------------------------- */
@@ -125,7 +125,7 @@ footer {
   color: rgba(0, 0, 0, 0.54);
 }
 .material-icons.md-dark.md-inactive {
-  color: rgba(0, 0, 0, 0.26);
+  color: #344955;
 }
 
 /* Rules for using icons as white on a dark background. */
@@ -133,5 +133,5 @@ footer {
   color: rgba(255, 255, 255, 1);
 }
 .material-icons.md-light.md-inactive {
-  color: rgba(255, 255, 255, 0.3);
+  color: #344955;
 }
