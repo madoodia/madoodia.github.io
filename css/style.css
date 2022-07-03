@@ -135,3 +135,8 @@ footer {
 .material-icons.md-light.md-inactive {
   color: #344955;
 }
+
+.forms {
+  width: 1000px;
+  height: 1400px;
+}
