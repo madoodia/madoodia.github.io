@@ -140,3 +140,10 @@ footer {
   /* width: 1000px; */
   height: 1400px;
 }
+
+.ourAlign {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f9aa33;
+}
