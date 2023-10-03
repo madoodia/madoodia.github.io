@@ -146,4 +146,29 @@ footer {
   justify-content: center;
   align-items: center;
   color: #f9aa33;
+  font-size: 20px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: #f9aa33;
+  width: max-content;
+  color: #344955;
+  text-align: center;
+  border-radius: 3px;
+
+  /* Position the tooltip */
+  position: absolute;
+  left: -10px;
+  top: -25px;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
