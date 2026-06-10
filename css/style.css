@@ -1,174 +1,178 @@
 body {
-  padding: 60px;
-  padding-left: 0px;
-  padding-right: 0px;
-  text-align: center;
-  background: #344955;
-  color: rgb(253, 253, 253);
-  font-size: 15px;
-  font-family: Tomorrow, serif;
+    padding: 60px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    background: #344955;
+    color: rgb(253, 253, 253);
+    font-size: 15px;
+    font-family: Tomorrow, serif;
 }
 
 header {
-  padding: 60px;
-  padding-left: 0px;
-  padding-right: 0px;
-  text-align: center;
-  background: #344955;
-  color: rgb(255, 255, 255);
-  font-size: 15px;
-  font-family: Tomorrow, serif;
+    padding: 60px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    background: #344955;
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    font-family: Tomorrow, serif;
 }
 
 #website-name {
-  color: #f9aa33;
+    color: #f9aa33;
 }
 
 footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #344955;
-  color: rgb(255, 255, 255);
-  font-size: 12px;
-  font-family: Tomorrow, serif;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #344955;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+    font-family: Tomorrow, serif;
 }
 
 .projects {
-  width: 65% !important;
-  padding: 0px;
-  margin: 0px !important;
-  text-align: center;
-  /* text-align: justify; */
-  /* text-align-last: center; */
+    width: 65% !important;
+    padding: 0px;
+    margin: 0px !important;
+    text-align: center;
+    /* text-align: justify; */
+    /* text-align-last: center; */
 }
 
 .projectLink {
-  position: relative;
-  width: 242px !important;
-  height: 227px !important;
-  margin: 0 10px 0px 0 !important;
-  text-align: center;
-  display: inline-block;
-  vertical-align: top;
+    position: relative;
+    width: 242px !important;
+    height: 227px !important;
+    margin: 0 10px 0px 0 !important;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
 }
 
 .projectThumb {
-  width: 240px;
-  height: 180px;
-  border: 1px solid rgb(255, 255, 255);
-  background-color: #344955;
-  background-size: 100%;
+    width: 240px;
+    height: 180px;
+    border: 1px solid rgb(255, 255, 255);
+    background-color: #344955;
+    background-size: 100%;
 }
 
 .demo-icon {
-  margin: 10;
-  color: #f9aa33;
-  padding: 1.5rem 1rem;
+    margin: 10;
+    color: #f9aa33;
+    padding: 1.5rem 1rem;
 }
 
 .demo-icon:hover {
-  margin: 10;
-  color: #ffffff;
-  padding: 1.5rem 1rem;
+    margin: 10;
+    color: #ffffff;
+    padding: 1.5rem 1rem;
 }
 
 #construction {
-  color: #f9aa33;
+    color: #f9aa33;
 }
 
 /* --------------------------------------- */
 /* Google Material Design Icon */
 .material-icons {
-  font-family: "Material Icons";
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px; /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px; /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
 
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;
 
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
 
-  /* Support for IE. */
-  font-feature-settings: "liga";
+    /* Support for IE. */
+    font-feature-settings: "liga";
 }
 
 /* Rules for sizing the icon. */
 .material-icons.md-18 {
-  font-size: 18px;
+    font-size: 18px;
 }
 .material-icons.md-24 {
-  font-size: 24px;
+    font-size: 24px;
 }
 .material-icons.md-36 {
-  font-size: 36px;
+    font-size: 36px;
 }
 .material-icons.md-48 {
-  font-size: 48px;
+    font-size: 48px;
 }
 
 /* Rules for using icons as black on a light background. */
 .material-icons.md-dark {
-  color: rgba(0, 0, 0, 0.54);
+    color: rgba(0, 0, 0, 0.54);
 }
 .material-icons.md-dark.md-inactive {
-  color: #344955;
+    color: #344955;
 }
 
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light {
-  color: rgba(255, 255, 255, 1);
+    color: rgba(255, 255, 255, 1);
 }
 .material-icons.md-light.md-inactive {
-  color: #344955;
+    color: #344955;
 }
 
 .forms {
-  /* width: 1000px; */
-  height: 1400px;
+    /* width: 1000px; */
+    height: 1400px;
 }
 
 .ourAlign {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #f9aa33;
-  font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f9aa33;
+    font-size: 20px;
 }
 
 .tooltip {
-  position: relative;
-  display: inline-flex;
+    position: relative;
+    display: inline-flex;
 }
 
 .tooltip .tooltiptext {
-  visibility: hidden;
-  background-color: #f9aa33;
-  width: max-content;
-  color: #344955;
-  text-align: center;
-  border-radius: 3px;
+    visibility: hidden;
+    background-color: #f9aa33;
+    width: max-content;
+    color: #344955;
+    text-align: center;
+    border-radius: 3px;
 
-  /* Position the tooltip */
-  position: absolute;
-  left: -10px;
-  top: -25px;
-  z-index: 1;
+    /* Position the tooltip */
+    position: absolute;
+    left: -10px;
+    top: -25px;
+    z-index: 1;
 }
 
 .tooltip:hover .tooltiptext {
-  visibility: visible;
+    visibility: visible;
+}
+.label {
+    color: #f9aa33; /* choose any color */
+    font-weight: 600;
 }
