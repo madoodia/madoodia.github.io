@@ -172,7 +172,7 @@ footer {
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
-.label {
+.title {
     color: #f9aa33; /* choose any color */
     font-weight: 600;
 }
