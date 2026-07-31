@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tangerine">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tomorrow">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium Web">
     <link rel="icon" type="image/x-icon" href="/images/feather-solid.svg">
@@ -23,64 +24,82 @@
 </head>
 
 <body>
+    <div class="background-decor">
+        <!-- SVG Goo Filter -->
+        <svg class="bubble-filter-svg" xmlns="http://www.w3.org/2000/svg" style="display: none; width: 0; height: 0; position: absolute; pointer-events: none;">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+
+        <!-- Bubble Container -->
+        <div class="bubbles-container">
+            <div class="bubble bubble-1"></div>
+            <div class="bubble bubble-2"></div>
+            <div class="bubble bubble-3"></div>
+            <div class="bubble bubble-4"></div>
+            <div class="bubble bubble-5"></div>
+            <div class="bubble interactive-bubble"></div>
+        </div>
+    </div>
     <main>
         <h1 id="website-name">madoodia.com</h1>
         <h4>--= May The Code Be With You =--</h4>
-        <br>
-        <br>
-        <br>
-        <a class="demo-icon" href="https://www.linkedin.com/in/madoodia/" target="_blank">
-            <div class="tooltip">
-                <i class="fab fa-linkedin" style="font-size:48px;"></i>
-                <span class="tooltiptext"> Linkedin </span>
+
+
+        <h3 class="tagline-container">Software Engineer</h3>
+
+        <div class="tagline-container">
+            <p class="tagline-text">
+                <i class="fa-solid fa-gears tagline-icon"></i>
+                Over 13 years of experience delivering state-of-the-art pipeline automation for VFX, Animation, and Game
+                companies.
+            </p>
+        </div>
+
+        <div class="skills-grid">
+            <div class="skills-card">
+                <h5><span class="title">Programming Languages</span></h5>
+                <p>[ C++ / Python / C# / Qt/QML / CMake ]</p>
             </div>
-        </a>
-        <a class="demo-icon" href="https://github.com/madoodia/" target="_blank">
-            <div class="tooltip">
-                <i class="fab fa-github" style="font-size:48px;"></i>
-                <span class="tooltiptext"> Github </span>
+            <div class="skills-card">
+                <h5><span class="title">C++ APIs</span></h5>
+                <p>[ Maya SDK / Houdini HDK / Qt API / UE5 API / Frostbite API ]</p>
             </div>
-        </a>
-        <a class="demo-icon" href="https://vimeo.com/madoodia/" target="_blank">
-            <div class="tooltip">
-                <i class="fab fa-vimeo" style="font-size:48px;"></i>
-                <span class="tooltiptext"> Vimeo </span>
+            <div class="skills-card">
+                <h5><span class="title">Graphic Softwares</span></h5>
+                <p>[ Maya / Houdini / Nuke / After Effects / ... ]</p>
             </div>
-        </a>
-        <a class="demo-icon" href="https://gumroad.com/madoodia/" target="_blank">
-            <div class="tooltip">
-                <i class="fa-solid fa-worm" style="font-size:48px;"></i>
-                <span class="tooltiptext"> Gumroad </span>
+            <div class="skills-card">
+                <h5><span class="title">Game Engines</span></h5>
+                <p>[ Unreal Engine / EA Frostbite ]</p>
             </div>
-        </a>
-        <a class="demo-icon" href="https://www.twitter.com/madoodia/" target="_blank">
-            <div class="tooltip">
-                <i class="fab fa-x-twitter" style="font-size:48px;"></i>
-                <span class="tooltiptext"> X-Twitter </span>
+            <div class="skills-card">
+                <h5><span class="title">Graphics APIs</span></h5>
+                <p>[ Vulkan / DirectX12 / OpenGL ]</p>
             </div>
-        </a>
-        <br>
-        <h3>Software Engineer - 3D Software Developer - Game Engine Programmer</h3></br>
-        <h4><span class="title">Programming Languages: </span>[ C++ / Python / C# / Qt/QMLL / CMake ]</h4>
-        <h4><span class="title">C++ APIs: </span>[Maya SDK /  Houdini HDK / Qt API / UE5 API / Frostbite API ]</h4>
-        <h4><span class="title">Graphic Softwares: </span>[Maya / Houdini / Nuke / After Effects / ... ]</h4>
-        <h4><span class="title">Game Engines: </span>[Unreal Engine / EA Frostbite]</h4>
-        <h4><span class="title">Graphics API: </span>[ Vulkan / DirectX12 / OpenGL ] [Learning Deeply]</h4>
-        <h4><span class="title">Shading Language: </span>[ GLSL / HLSL / OSL ] [Learning Deeply]</h4>
-        <h4>[ ... ]</h4>
-        <br>
-        <h4 id="website-name">hello@madoodia.com</h4>
-        <br>
-        <i id="construction" class="fas fa-drafting-compass" style="font-size:48px;"></i>
-        <br>
-        <br>
-        <h3>( Updating... )</h3>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
+            <div class="skills-card">
+                <h5><span class="title">Shading Languages</span></h5>
+                <p>[ GLSL / HLSL / OSL ]</p>
+            </div>
+            <div class="skills-card featured-card">
+                <h5><span class="title">AI Engineering & Automation</span></h5>
+                <p>[ LLMs / Agentic Workflows / RAG / Prompt Engineering ]</p>
+            </div>
+        </div>
+
+        <div class="agency-cta-container">
+            <a class="agency-cta-btn">
+                <i class="fa-solid fa-robot"></i>
+                 hello@madoodia.com
+                <i class="fa-solid fa-robot"></i>
+            </a>
+        </div>
+
         <!-- <a class="demo-icon" href="https://madoodia.com/Resume_Template_2022.pdf" target="_blank">
             <div class="tooltip">
                 <i class="fas fa-file-pdf" style="font-size:48px;"></i>
@@ -90,8 +109,48 @@
         <!-- <a class="demo-icon" href="https://madoodia.com/application" target="_blank"><i class="fas fa-address-card" style="font-size:48px;"></i></a> -->
     </main>
     <footer>
-        <div class="ourAlign">
-            © 2026 madoodia.com
+        <div class="footer-content">
+            <div class="footer-social-links">
+                <a class="footer-social-icon" href="https://www.linkedin.com/in/madoodia/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fab fa-linkedin"></i>
+                        <span class="tooltiptext"> Linkedin </span>
+                    </div>
+                </a>
+                <a class="footer-social-icon" href="https://github.com/madoodia/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fab fa-github"></i>
+                        <span class="tooltiptext"> Github </span>
+                    </div>
+                </a>
+                <a class="footer-social-icon" href="https://vimeo.com/madoodia/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fab fa-vimeo"></i>
+                        <span class="tooltiptext"> Vimeo </span>
+                    </div>
+                </a>
+                <a class="footer-social-icon" href="https://gumroad.com/madoodia/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fa-solid fa-worm"></i>
+                        <span class="tooltiptext"> Gumroad </span>
+                    </div>
+                </a>
+                <a class="footer-social-icon" href="https://www.twitter.com/madoodia/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fab fa-x-twitter"></i>
+                        <span class="tooltiptext"> X-Twitter </span>
+                    </div>
+                </a>
+                <a class="footer-social-icon" href="https://www.youtube.com/@RezaAarabi/" target="_blank">
+                    <div class="tooltip">
+                        <i class="fab fa-youtube"></i>
+                        <span class="tooltiptext"> Youtube </span>
+                    </div>
+                </a>
+            </div>
+            <div class="ourAlign">
+                (C) 2026 madoodia.com
+            </div>
         </div>
     </footer>
 </body>
