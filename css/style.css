@@ -498,6 +498,30 @@ footer {
     z-index: 5;
 }
 
+.material-symbols-outlined {
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
+}
+
+.agency-cta-nobtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7vh 1.6rem !important;
+    background: linear-gradient(135deg, #00fff7, #0062ff);
+    color: #121214 !important;
+    text-decoration: none !important;
+    font-family: "Tomorrow", sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.85rem, 1.7vh, 1rem) !important;
+    letter-spacing: 0.5px;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(255, 85, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 .agency-cta-btn {
     display: inline-flex;
     align-items: center;
@@ -512,22 +536,22 @@ footer {
     letter-spacing: 0.5px;
     border-radius: 30px;
     box-shadow: 0 4px 12px rgba(255, 85, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 2.5);
 }
 
 .agency-cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(255, 183, 0, 0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(36, 36, 36, 0.5);
     filter: brightness(1.05);
 }
 
 .agency-cta-btn:active {
-    transform: translateY(1px);
+    transform: translateY(2px);
     box-shadow: 0 3px 8px rgba(255, 85, 0, 0.25);
 }
 
 .agency-cta-btn i {
-    font-size: 1rem;
+    font-size: 1.2rem;
 }
 
 /* Headings Adjustments */
