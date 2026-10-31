@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OSL Shader Studio &amp; Multi-Style Interactive Viewer | Reza Aarabi</title>
+  <meta name="description" content="High-fidelity interactive comparison, 4-6 style multi-layer stacking, difference map inspection, and multi-pass video showcase for Open Shading Language (OSL) production renders.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../images/feather-solid.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tomorrow:wght@400;600;700;800&family=Inconsolata:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="../css/fontawesome-6.4.2/css/all.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Ambient Atmospheric Glows -->
+  <div class="ambient-glows" aria-hidden="true">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header class="osl-navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <a href="../index.html" class="nav-back-pill" title="Return to portfolio homepage">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Portfolio</span>
+        </a>
+        <span class="brand-title">OSL Shader Studio</span>
+        <span class="brand-badge">VFX Pipeline</span>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#comparator"><i class="fa-solid fa-sliders"></i> A/B Wipe</a></li>
+          <li><a href="#multi-stack"><i class="fa-solid fa-layer-group"></i> 4–6 Multi-Stack</a></li>
+          <li><a href="#video-showcase"><i class="fa-solid fa-play"></i> Video Demo</a></li>
+          <li><a href="#gallery"><i class="fa-solid fa-images"></i> Passes Gallery</a></li>
+          <li><a href="#specifications"><i class="fa-solid fa-microchip"></i> Specs</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/madoodia" target="_blank" class="nav-action-btn" rel="noopener noreferrer">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-pill">
+        <span class="dot"></span>
+        <span>Open Shading Language &bull; 1920&times;1080 Native Resolution</span>
+      </div>
+      <h1 class="hero-title">
+        Real-Time <span class="gradient-text">OSL Shader Comparison</span> &amp; Render Lab
+      </h1>
+      <p class="hero-description">
+        Interactive A/B wipe comparator, 4–6 style layer stacking, pixel-difference analysis, and multi-pass inspection suite built for production shading, look-development, and shader architecture.
+      </p>
+      
+      <div class="hero-quick-stats">
+        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> 1:1 Pixel Overlap</span>
+        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> 4–6 Style Compositor</span>
+        <span class="stat-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> Difference Map Diffing</span>
+        <span class="stat-chip"><i class="fa-solid fa-film"></i> Video Demonstration</span>
+        <span class="stat-chip"><i class="fa-solid fa-upload"></i> Local Drag &amp; Drop Testing</span>
+      </div>
+    </section>
+
+    <!-- 1. Interactive A/B Comparison Suite -->
+    <section id="comparator" class="comparator-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-sliders"></i> Interactive A/B Comparison</h2>
+          <p>Drag the slider bar or click anywhere to reveal shader variations between baseline and OSL output.</p>
+        </div>
+
+        <div class="toolbar-group">
+          <span style="font-size: 0.82rem; color: var(--text-dim); margin-right: 0.25rem;">Jump:</span>
+          <button type="button" class="quick-pct-btn" data-pct="0">0%</button>
+          <button type="button" class="quick-pct-btn" data-pct="25">25%</button>
+          <button type="button" class="quick-pct-btn" data-pct="50">50%</button>
+          <button type="button" class="quick-pct-btn" data-pct="75">75%</button>
+          <button type="button" class="quick-pct-btn" data-pct="100">100%</button>
+        </div>
+      </div>
+
+      <!-- Controls Toolbar -->
+      <div class="comparator-toolbar">
+        <div class="toolbar-group">
+          <button type="button" class="mode-btn active" data-mode="split" title="Split Screen Wipe">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> Split Wipe
+          </button>
+          <button type="button" class="mode-btn" data-mode="difference" title="Highlight exact pixel differences">
+            <i class="fa-solid fa-bolt"></i> Difference Map
+          </button>
+          <button type="button" class="mode-btn" data-mode="opacity" title="Onion Skin / Opacity Crossfade">
+            <i class="fa-solid fa-circle-half-stroke"></i> Onion Skin
+          </button>
+          <button type="button" class="mode-btn" data-mode="side-by-side" title="Side by Side Layout">
+            <i class="fa-solid fa-table-columns"></i> Side by Side
+          </button>
+        </div>
+
+        <div class="toolbar-group">
+          <button type="button" id="btn-fullscreen" class="action-icon-btn" title="Toggle Fullscreen View">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Comparison Canvas Stage -->
+      <div id="comparator-stage" class="comparator-stage">
+        <!-- Overlay Badges -->
+        <div class="badge-pill badge-before">
+          <i class="fa-solid fa-camera"></i> Before / Baseline
+        </div>
+        <div class="badge-pill badge-after">
+          <i class="fa-solid fa-sparkles"></i> After / OSL Shader
+        </div>
+
+        <!-- Diff Map Active Banner -->
+        <div class="diff-indicator-alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>Difference Mode Active: Pure black means identical pixels; bright colors indicate shader changes.</span>
+        </div>
+
+        <!-- Image Canvas -->
+        <div id="comparison-box" class="comparison-box">
+          <!-- Bottom/Base Layer: After Image -->
+          <div class="layer-after">
+            <img id="img-after" src="../images/oslviewer/Render_01_after.png" alt="Render 01 After - OSL Shader" />
+          </div>
+
+          <!-- Top Overlay Layer: Before Image (Pixel-Perfect Overlay clipped with CSS polygon) -->
+          <div class="layer-before">
+            <img id="img-before" src="../images/oslviewer/Render_01_before.png" alt="Render 01 Before - Baseline Reference" />
+          </div>
+
+          <!-- Vertical Split Line -->
+          <div class="slider-bar" aria-hidden="true"></div>
+
+          <!-- Draggable Knob Handle -->
+          <div class="slider-knob" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M8.5 7l-5 5 5 5V7zm7 10l5-5-5-5v10z"/>
+            </svg>
+          </div>
+
+          <!-- Range Input Slider for Accessibility and Direct Manipulation -->
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            step="0.1"
+            id="range-slider-input"
+            class="range-slider-input"
+            aria-label="Comparison slider percentage"
+          />
+        </div>
+
+        <!-- Bottom Caption & Quick Actions Strip -->
+        <div class="comparator-caption-strip">
+          <div class="caption-meta">
+            <div class="caption-meta-item">
+              <i class="fa-solid fa-ruler-combined"></i>
+              <span>Resolution: <span class="highlight">1920 &times; 1080</span></span>
+            </div>
+            <div class="caption-meta-item">
+              <i class="fa-solid fa-gauge-high"></i>
+              <span>Split Position: <span id="slider-pct-display" class="highlight">50%</span></span>
+            </div>
+          </div>
+
+          <div class="caption-meta">
+            <button type="button" id="flash-compare-btn" class="flash-compare-btn" title="Hold to quickly view Before, release to return">
+              <i class="fa-solid fa-eye"></i>
+              <span>Hold to Flip (Spacebar)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Drag & Drop Testing Zone (Upload & Test Your Own Renders) -->
+      <div class="custom-upload-card" id="custom-upload-card">
+        <div class="upload-header">
+          <h3>
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Test Custom Renders Locally (A/B Pair)</span>
+          </h3>
+          <button type="button" id="btn-reset-pair" class="btn-reset-pair" title="Reset back to default Render 01 pair">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Default
+          </button>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Drag &amp; drop any two render files below (PNG, JPG, WebP) to test them live in the comparison viewer without leaving your browser.
+        </p>
+        <div class="upload-grid">
+          <div class="upload-drop-zone" id="drop-zone-before">
+            <i class="fa-regular fa-image"></i>
+            <span class="zone-label">Drop &ldquo;Before&rdquo; Image Here</span>
+            <p>Or click to browse local file</p>
+            <input type="file" id="input-file-before" class="file-hidden-input" accept="image/*">
+          </div>
+          <div class="upload-drop-zone" id="drop-zone-after">
+            <i class="fa-regular fa-image"></i>
+            <span class="zone-label">Drop &ldquo;After&rdquo; Image Here</span>
+            <p>Or click to browse local file</p>
+            <input type="file" id="input-file-after" class="file-hidden-input" accept="image/*">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Multi-Style Layer Stack (Compare 4–6 Images On Top of Each Other) -->
+    <section id="multi-stack" class="multi-stack-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-layer-group"></i> Multi-Style Layer Stack (4–6 Images)</h2>
+          <p>Stack, blend, solo, and compare 4 to 6 different styles, AOVs, or revisions pixel-for-pixel on top of each other.</p>
+        </div>
+
+        <div class="toolbar-group">
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Keys 1–6: Solo Style</span>
+        </div>
+      </div>
+
+      <!-- Multi-Toolbar: View Switcher and Playback -->
+      <div class="multi-toolbar">
+        <div class="multi-view-tabs">
+          <button type="button" class="multi-view-btn active" data-multimode="mixer">
+            <i class="fa-solid fa-sliders"></i> Layer Mixer Stack
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="curtain">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> Multi-Curtain Wipe
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="matrix">
+            <i class="fa-solid fa-table-cells"></i> Synchronized Matrix (3&times;2)
+          </button>
+        </div>
+
+        <div class="playback-controls">
+          <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through all 6 styles">
+            <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
+          </button>
+        </div>
+      </div>
+
+      <!-- Multi-Stage Card with 6 Stacked Layers -->
+      <div id="multi-stage-card" class="multi-stage-card">
+        <!-- Live Active Style Badge -->
+        <div id="multi-active-pill" class="multi-active-pill">
+          <span class="pill-num" id="active-layer-num">1</span>
+          <span id="active-layer-title">Beauty Pass (OSL Shader)</span>
+        </div>
+
+        <!-- 6-Layer Canvas (All pixel-aligned 16:9) -->
+        <div id="multi-canvas" class="multi-canvas">
+          <!-- Layer 1: Beauty Pass -->
+          <div id="stack-layer-1" class="stack-layer" style="z-index: 1; opacity: 1;">
+            <img src="../images/oslviewer/Render_01_after.png" alt="Style 1: Beauty Pass" />
+          </div>
+
+          <!-- Layer 2: Baseline Reference -->
+          <div id="stack-layer-2" class="stack-layer" style="z-index: 2; opacity: 0;">
+            <img src="../images/oslviewer/Render_01_before.png" alt="Style 2: Baseline Reference" />
+          </div>
+
+          <!-- Layer 3: Difference Heatmap -->
+          <div id="stack-layer-3" class="stack-layer" style="z-index: 3; opacity: 0; mix-blend-mode: difference; filter: contrast(180%) brightness(140%);">
+            <img src="../images/oslviewer/Render_01_before.png" alt="Style 3: Difference Heatmap" />
+          </div>
+
+          <!-- Layer 4: Specular / Micro-Roughness -->
+          <div id="stack-layer-4" class="stack-layer" style="z-index: 4; opacity: 0; filter: contrast(220%) brightness(120%) grayscale(60%);">
+            <img src="../images/oslviewer/Render_01_after.png" alt="Style 4: Specular Pass" />
+          </div>
+
+          <!-- Layer 5: Clay / Surface Form -->
+          <div id="stack-layer-5" class="stack-layer" style="z-index: 5; opacity: 0; filter: grayscale(100%) contrast(110%) brightness(95%);">
+            <img src="../images/oslviewer/Render_01_after.png" alt="Style 5: Clay Form" />
+          </div>
+
+          <!-- Layer 6: Silhouette / Edge Contour -->
+          <div id="stack-layer-6" class="stack-layer" style="z-index: 6; opacity: 0; filter: invert(85%) hue-rotate(180deg) contrast(140%);">
+            <img src="../images/oslviewer/Render_01_after.png" alt="Style 6: Silhouette Pass" />
+          </div>
+
+          <!-- Container for draggable Multi-Curtain vertical dividers -->
+          <div id="multi-curtain-dividers" class="multi-curtain-dividers" style="display: none;"></div>
+        </div>
+
+        <!-- Synchronized Matrix Grid View (3x2) -->
+        <div id="matrix-grid-container" class="matrix-grid-container">
+          <!-- Populated dynamically by viewer.js with all 6 active style layers -->
+        </div>
+
+        <!-- Continuous Scrubber Strip (Fluidly cross-fade from style 1 to 6) -->
+        <div class="scrub-bar-strip">
+          <div style="font-size: 0.84rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+            <i class="fa-solid fa-wave-square" style="color: var(--accent-cyan);"></i> Style Scrub:
+          </div>
+          <div class="scrub-slider-wrap">
+            <input type="range" id="scrub-range-slider" class="scrub-slider-track" min="1" max="6" step="0.02" value="1">
+            <div class="scrub-ticks">
+              <span class="scrub-tick-item active" data-scrub="1">[1] Beauty</span>
+              <span class="scrub-tick-item" data-scrub="2">[2] Baseline</span>
+              <span class="scrub-tick-item" data-scrub="3">[3] Diff Map</span>
+              <span class="scrub-tick-item" data-scrub="4">[4] Specular</span>
+              <span class="scrub-tick-item" data-scrub="5">[5] Clay</span>
+              <span class="scrub-tick-item" data-scrub="6">[6] Silhouette</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer Compositor Deck (Photoshop / Nuke style Layer Mixer) -->
+      <div class="layer-mixer-deck">
+        <div class="deck-header">
+          <h3>
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Layer Compositing Deck</span>
+          </h3>
+          <span class="deck-quick-hotkeys">
+            Press keys <strong>1, 2, 3, 4, 5, 6</strong> on your keyboard to instantly solo any style
+          </span>
+        </div>
+
+        <!-- 6 Layer Rows List -->
+        <div class="layer-rows-list" id="layer-rows-list">
+          <!-- Dynamically managed by viewer.js -->
+        </div>
+
+        <!-- Bulk Multi-Image Uploader Dropzone -->
+        <div class="bulk-uploader-card" id="bulk-uploader-card">
+          <i class="fa-solid fa-images"></i>
+          <h4>Drop 4 to 6 Images Here at Once</h4>
+          <p>
+            Drag and drop up to 6 image files (or click to browse). They will automatically populate Style Layers 1 through 6 for instant pixel comparison.
+          </p>
+          <input type="file" id="bulk-file-input" class="file-hidden-input" multiple accept="image/*">
+          <button type="button" id="btn-reset-multi-defaults" class="btn-reset-pair" style="margin-top: 0.4rem;">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Default 6 Passes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Video Showcase Section -->
+    <section id="video-showcase" class="video-showcase-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-film"></i> Video Demonstration &amp; Shader Breakdown</h2>
+          <p>Watch the dynamic shader attributes, lighting response, and camera rotation in motion.</p>
+        </div>
+      </div>
+
+      <div class="video-grid">
+        <!-- Main Video Card -->
+        <div class="video-main-card">
+          <div class="video-iframe-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/dzqDU9efnnk"
+              title="OSL Shader Video Demonstration"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="video-card-body">
+            <div class="video-tag">
+              <i class="fa-solid fa-circle-play"></i> Featured Demo
+            </div>
+            <h3 class="video-title">OSL Shader Execution &amp; Lighting Response</h3>
+            <p class="video-description">
+              Full demonstration of the Open Shading Language custom shader evaluation, showing ray-traced reflections, subsurface approximation, and procedural texture displacement.
+            </p>
+          </div>
+        </div>
+
+        <!-- Sidebar: Video Clips & Upload Instructions -->
+        <div class="video-sidebar-list">
+          <a href="https://youtu.be/dzqDU9efnnk" target="_blank" class="video-side-card" rel="noopener noreferrer">
+            <div class="side-thumb-box">
+              <img src="../images/oslviewer/Render_01_after.png" alt="Demo thumbnail">
+              <span class="play-icon"><i class="fa-solid fa-play"></i></span>
+            </div>
+            <div class="side-info">
+              <h4>Direct YouTube Link</h4>
+              <p>Watch in 1080p 60fps on YouTube</p>
+            </div>
+          </a>
+
+          <a href="https://youtu.be/b1LAqVXkznk" target="_blank" class="video-side-card" rel="noopener noreferrer">
+            <div class="side-thumb-box">
+              <img src="../images/oslviewer/Render_01_before.png" alt="Portfolio reel thumbnail">
+              <span class="play-icon"><i class="fa-solid fa-play"></i></span>
+            </div>
+            <div class="side-info">
+              <h4>Pipeline &amp; VFX Showreel</h4>
+              <p>13+ years pipeline automation overview</p>
+            </div>
+          </a>
+
+          <!-- Video Upload Template Note -->
+          <div class="video-side-card" style="cursor: default; border-style: dashed;">
+            <div class="side-thumb-box" style="background: rgba(0, 240, 255, 0.08);">
+              <i class="fa-solid fa-video" style="font-size: 1.5rem; color: var(--accent-cyan);"></i>
+            </div>
+            <div class="side-info">
+              <h4>Add More Videos</h4>
+              <p>Place an MP4 into the project folder or embed any YouTube/Vimeo player using the template comments in this file.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Multi-Pass Render Gallery -->
+    <section id="gallery" class="gallery-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-images"></i> Project Passes &amp; Shot Gallery</h2>
+          <p>Inspect multi-pass AOVs, texture maps, and additional render angles. Click to load into comparator or enlarge.</p>
+        </div>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Card 1: Hero Render 01 (After) -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render_01_after.png" alt="Render 01 - OSL Shader">
+            <span class="thumb-badge">Final OSL Shader</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render_01_before.png"
+                data-after="../images/oslviewer/Render_01_after.png">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render_01_after.png"
+                data-title="Render 01 - Final OSL Shader">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render 01 &mdash; Beauty Pass (OSL)</h4>
+            <p>Full shader evaluation with procedural micro-roughness and energy-conserving specular distribution.</p>
+          </div>
+        </div>
+
+        <!-- Card 2: Hero Render 01 (Before / Reference) -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render_01_before.png" alt="Render 01 - Baseline Reference">
+            <span class="thumb-badge" style="color: var(--accent-amber); border-color: rgba(255, 183, 0, 0.3);">Baseline Reference</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render_01_before.png"
+                data-after="../images/oslviewer/Render_01_after.png">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render_01_before.png"
+                data-title="Render 01 - Baseline Reference">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render 01 &mdash; Baseline Reference</h4>
+            <p>Original input render pass used as the ground-truth benchmark for differential shading comparison.</p>
+          </div>
+        </div>
+
+        <!-- Card 3: Easy Add Template -->
+        <div class="gallery-card gallery-card-add" onclick="document.getElementById('multi-stack').scrollIntoView({behavior: 'smooth'})">
+          <i class="fa-solid fa-folder-plus"></i>
+          <h4>Upload 4–6 Renders</h4>
+          <p>Add new images to <code>images/oslviewer/</code> or drop them in the 4–6 layer stack above to compare.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Technical Specifications Section -->
+    <section id="specifications" class="specs-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-microchip"></i> Architecture &amp; Technical Highlights</h2>
+          <p>Engineered for high performance, accuracy, and pipeline flexibility.</p>
+        </div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-card">
+          <div class="spec-icon"><i class="fa-solid fa-crosshairs"></i></div>
+          <h3>1:1 Subpixel Accuracy</h3>
+          <p>Zero optical distortion. All 6 layers are anchored at true 16:9 1920&times;1080 resolution with hardware-accelerated clipping polygons.</p>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <h3>Multi-Style Compositor</h3>
+          <p>Compare up to 6 styles on top of each other with independent opacity curves, blend modes (Difference, Multiply, Screen), and hotkey soloing.</p>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <h3>VFX AOV &amp; Diff Inspection</h3>
+          <p>Difference blending reveals mathematical deviations between passes, ideal for regression testing shader revisions.</p>
+        </div>
+
+        <div class="spec-card">
+          <div class="spec-icon"><i class="fa-solid fa-cube"></i></div>
+          <h3>Pipeline Ready</h3>
+          <p>Fully compatible with Maya, Houdini, Arnold, OpenUSD, MaterialX, and automated CI render verification scripts.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox-modal" class="lightbox-modal" aria-hidden="true" role="dialog">
+    <div class="lightbox-content">
+      <button type="button" id="lightbox-close-btn" class="lightbox-close-btn" aria-label="Close image preview">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Fullscreen Preview">
+      <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="osl-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h4>Reza Aarabi &bull; Pipeline Architect &amp; Software Engineer</h4>
+        <p>VFX &bull; Animation &bull; Games &bull; Pipeline Automation</p>
+      </div>
+
+      <div class="footer-social-links">
+        <a class="footer-social-icon" href="https://www.linkedin.com/in/madoodia/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+          <i class="fa-brands fa-linkedin"></i>
+        </a>
+        <a class="footer-social-icon" href="https://github.com/madoodia/" target="_blank" rel="noopener noreferrer" title="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a class="footer-social-icon" href="https://vimeo.com/madoodia/" target="_blank" rel="noopener noreferrer" title="Vimeo">
+          <i class="fa-brands fa-vimeo"></i>
+        </a>
+        <a class="footer-social-icon" href="https://gumroad.com/madoodia/" target="_blank" rel="noopener noreferrer" title="Gumroad">
+          <i class="fa-solid fa-worm"></i>
+        </a>
+        <a class="footer-social-icon" href="https://www.twitter.com/madoodia/" target="_blank" rel="noopener noreferrer" title="X-Twitter">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a class="footer-social-icon" href="https://www.youtube.com/@RezaAarabi/" target="_blank" rel="noopener noreferrer" title="YouTube">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+      </div>
+
+      <div class="footer-copyright">
+        &copy; 2026 madoodia.com &bull; All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <!-- Viewer Script -->
+  <script src="viewer.js"></script>
+</body>
+</html>

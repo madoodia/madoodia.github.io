@@ -495,7 +495,31 @@ footer {
     margin: 2.5vh 0 1vh 0;
     display: flex;
     justify-content: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
     z-index: 5;
+}
+
+.agency-cta-btn.osl-featured-cta {
+    background: linear-gradient(135deg, #00f0ff, #0072ff);
+    color: #07080f !important;
+    box-shadow: 0 4px 12px rgba(0, 240, 255, 0.35);
+}
+
+.agency-cta-btn.osl-featured-cta:hover {
+    box-shadow: 0 6px 18px rgba(0, 240, 255, 0.55);
+}
+
+.skill-osl-link {
+    color: #ffb700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s ease;
+}
+
+.skill-osl-link:hover {
+    color: #00f0ff;
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
 }
 
 .material-symbols-outlined {
