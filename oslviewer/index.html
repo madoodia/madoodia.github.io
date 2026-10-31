@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OSL Shader Studio &amp; Multi-Style Interactive Viewer | Reza Aarabi</title>
-  <meta name="description" content="High-fidelity interactive comparison, 4-6 style multi-layer stacking, difference map inspection, and multi-pass video showcase for Open Shading Language (OSL) production renders.">
+  <title>OSL Shader Studio &amp; Multi-Sample Interactive Viewer | Reza Aarabi</title>
+  <meta name="description" content="High-fidelity interactive comparison, multiple ordered render samples, OptiX shader passes, and multi-layer stacking for production renders.">
   
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="../images/feather-solid.svg">
@@ -39,15 +39,15 @@
           <span>Portfolio</span>
         </a>
         <span class="brand-title">OSL Shader Studio</span>
-        <span class="brand-badge">VFX Pipeline</span>
+        <span class="brand-badge">OptiX &bull; VFX Pipeline</span>
       </div>
 
       <nav>
         <ul class="nav-links">
+          <li><a href="#multi-stack"><i class="fa-solid fa-layer-group"></i> Ordered Samples</a></li>
           <li><a href="#comparator"><i class="fa-solid fa-sliders"></i> A/B Wipe</a></li>
-          <li><a href="#multi-stack"><i class="fa-solid fa-layer-group"></i> 4–6 Multi-Stack</a></li>
           <li><a href="#video-showcase"><i class="fa-solid fa-play"></i> Video Demo</a></li>
-          <li><a href="#gallery"><i class="fa-solid fa-images"></i> Passes Gallery</a></li>
+          <li><a href="#gallery"><i class="fa-solid fa-images"></i> Sample Sets Gallery</a></li>
           <li><a href="#specifications"><i class="fa-solid fa-microchip"></i> Specs</a></li>
         </ul>
       </nav>
@@ -66,30 +66,151 @@
     <section class="hero-section">
       <div class="hero-pill">
         <span class="dot"></span>
-        <span>Open Shading Language &bull; 1920&times;1080 Native Resolution</span>
+        <span>Open Shading Language &bull; NVIDIA OptiX &bull; Ordered Multi-Sample Inspection</span>
       </div>
       <h1 class="hero-title">
         Real-Time <span class="gradient-text">OSL Shader Comparison</span> &amp; Render Lab
       </h1>
       <p class="hero-description">
-        Interactive A/B wipe comparator, 4–6 style layer stacking, pixel-difference analysis, and multi-pass inspection suite built for production shading, look-development, and shader architecture.
+        Organize, blend, and compare genuine OptiX and OSL render passes in logical sequence across multiple shot samples &mdash; featuring multi-wipe curtains, synchronized matrices, and A/B diffing.
       </p>
       
       <div class="hero-quick-stats">
-        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> 1:1 Pixel Overlap</span>
-        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> 4–6 Style Compositor</span>
+        <span class="stat-chip"><i class="fa-solid fa-layer-group"></i> Ordered Multi-Samples</span>
+        <span class="stat-chip"><i class="fa-solid fa-sliders"></i> 1:1 Pixel Overlap</span>
         <span class="stat-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> Difference Map Diffing</span>
         <span class="stat-chip"><i class="fa-solid fa-film"></i> Video Demonstration</span>
-        <span class="stat-chip"><i class="fa-solid fa-upload"></i> Local Drag &amp; Drop Testing</span>
+        <span class="stat-chip"><i class="fa-solid fa-upload"></i> Drag &amp; Drop Testing</span>
       </div>
     </section>
 
-    <!-- 1. Interactive A/B Comparison Suite -->
+    <!-- Global Sample Selector Bar -->
+    <div class="sample-selector-bar">
+      <span class="sample-selector-label">
+        <i class="fa-solid fa-film"></i> Active Sample:
+      </span>
+      <button type="button" class="sample-btn active" data-sample="optix" title="OptiX 4-Pass Pipeline Sequence">
+        <span>Sample 1: OptiX Ray-Tracing</span>
+        <span class="sample-badge-count">4 Passes</span>
+      </button>
+      <button type="button" class="sample-btn" data-sample="flat" title="Viewport Flat Shading Progression">
+        <span>Sample 2: Viewport Flat Shading</span>
+        <span class="sample-badge-count">3 Passes</span>
+      </button>
+      <button type="button" class="sample-btn" data-sample="osl" title="OSL Shader Baseline Benchmark">
+        <span>Sample 3: OSL Benchmark</span>
+        <span class="sample-badge-count">2 Passes</span>
+      </button>
+      <button type="button" class="sample-btn" data-sample="all" title="Full 8-Render Numerical Sequence">
+        <span>Sample 4: Complete Sequence</span>
+        <span class="sample-badge-count">Render 01&ndash;08</span>
+      </button>
+    </div>
+
+    <!-- 1. Multi-Style Layer Stack (Ordered Samples Engine) -->
+    <section id="multi-stack" class="multi-stack-section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2><i class="fa-solid fa-layer-group"></i> Multi-Style Layer Stack (Ordered Passes)</h2>
+          <p>Stack, blend, solo, and scrub through the active sample's render passes in exact pipeline order.</p>
+        </div>
+
+        <div class="toolbar-group">
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Keys 1&ndash;8: Solo Pass</span>
+        </div>
+      </div>
+
+      <!-- Multi-Toolbar: View Switcher and Playback -->
+      <div class="multi-toolbar">
+        <div class="multi-view-tabs">
+          <button type="button" class="multi-view-btn active" data-multimode="mixer">
+            <i class="fa-solid fa-sliders"></i> Layer Mixer Stack
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="curtain">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i> Multi-Curtain Wipe
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="matrix">
+            <i class="fa-solid fa-table-cells"></i> Synchronized Matrix
+          </button>
+        </div>
+
+        <div class="playback-controls">
+          <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through all passes in sequence">
+            <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
+          </button>
+        </div>
+      </div>
+
+      <!-- Multi-Stage Card with Stacked Layers -->
+      <div id="multi-stage-card" class="multi-stage-card">
+        <!-- Live Active Style Badge -->
+        <div id="multi-active-pill" class="multi-active-pill">
+          <span class="pill-num" id="active-layer-num">1</span>
+          <span id="active-layer-title">Render07: OptiX Raw Ray-Traced Shading</span>
+        </div>
+
+        <!-- Canvas (Populated dynamically by viewer.js with the active sample's layers in order) -->
+        <div id="multi-canvas" class="multi-canvas">
+          <div id="multi-curtain-dividers" class="multi-curtain-dividers" style="display: none;"></div>
+        </div>
+
+        <!-- Synchronized Matrix Grid View -->
+        <div id="matrix-grid-container" class="matrix-grid-container">
+          <!-- Populated dynamically by viewer.js -->
+        </div>
+
+        <!-- Continuous Scrubber Strip (Fluidly cross-fade through the sample passes in order) -->
+        <div class="scrub-bar-strip">
+          <div style="font-size: 0.84rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+            <i class="fa-solid fa-wave-square" style="color: var(--accent-cyan);"></i> Pass Scrub:
+          </div>
+          <div class="scrub-slider-wrap">
+            <input type="range" id="scrub-range-slider" class="scrub-slider-track" min="1" max="4" step="0.02" value="1">
+            <div class="scrub-ticks" id="scrub-ticks-wrap">
+              <!-- Populated dynamically by viewer.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer Compositor Deck (Photoshop / Nuke style Layer Mixer) -->
+      <div class="layer-mixer-deck">
+        <div class="deck-header">
+          <h3>
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Layer Compositing Deck</span>
+          </h3>
+          <span class="deck-quick-hotkeys">
+            Press keys <strong>1, 2, 3, 4...</strong> on your keyboard to instantly solo any pass
+          </span>
+        </div>
+
+        <!-- Layer Rows List -->
+        <div class="layer-rows-list" id="layer-rows-list">
+          <!-- Dynamically populated by viewer.js -->
+        </div>
+
+        <!-- Bulk Multi-Image Uploader Dropzone -->
+        <div class="bulk-uploader-card" id="bulk-uploader-card">
+          <i class="fa-solid fa-images"></i>
+          <h4>Drop Images Here to Populate Active Sample</h4>
+          <p>
+            Drag and drop image files (or click to browse). They will populate the active sample layers in order.
+          </p>
+          <input type="file" id="bulk-file-input" class="file-hidden-input" multiple accept="image/*">
+          <button type="button" id="btn-reset-multi-defaults" class="btn-reset-pair" style="margin-top: 0.4rem;">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Default Sample Passes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Interactive A/B Comparison Suite -->
     <section id="comparator" class="comparator-section">
       <div class="section-header">
         <div class="section-title-wrap">
           <h2><i class="fa-solid fa-sliders"></i> Interactive A/B Comparison</h2>
-          <p>Drag the slider bar or click anywhere to reveal shader variations between baseline and OSL output.</p>
+          <p>Drag the slider bar or click anywhere to reveal shader variations between two passes.</p>
         </div>
 
         <div class="toolbar-group">
@@ -102,7 +223,7 @@
         </div>
       </div>
 
-      <!-- Controls Toolbar -->
+      <!-- Controls Toolbar with Presets -->
       <div class="comparator-toolbar">
         <div class="toolbar-group">
           <button type="button" class="mode-btn active" data-mode="split" title="Split Screen Wipe">
@@ -119,6 +240,46 @@
           </button>
         </div>
 
+        <!-- Preset Comparison Pairs (Using Real Project Images) -->
+        <div class="pair-preset-group">
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Pairs:</span>
+          <button type="button" class="pair-preset-btn active"
+            data-before="../images/oslviewer/Render07.png"
+            data-after="../images/oslviewer/Render08.png"
+            data-before-title="Render07: Raw Shading"
+            data-after-title="Render08: Post Render">
+            Raw vs Post (S1)
+          </button>
+          <button type="button" class="pair-preset-btn"
+            data-before="../images/oslviewer/Render04.png"
+            data-after="../images/oslviewer/Render08.png"
+            data-before-title="Render04: Depth Buffer"
+            data-after-title="Render08: Post Render">
+            Depth vs Post (S1)
+          </button>
+          <button type="button" class="pair-preset-btn"
+            data-before="../images/oslviewer/Render05.png"
+            data-after="../images/oslviewer/Render08.png"
+            data-before-title="Render05: DOF Debug"
+            data-after-title="Render08: Post Render">
+            DOF Debug vs Post (S1)
+          </button>
+          <button type="button" class="pair-preset-btn"
+            data-before="../images/oslviewer/Render02.png"
+            data-after="../images/oslviewer/Render03.png"
+            data-before-title="Render02: Flat Base"
+            data-after-title="Render03: Flat Post">
+            Flat Base vs Post (S2)
+          </button>
+          <button type="button" class="pair-preset-btn"
+            data-before="../images/oslviewer/Render06.png"
+            data-after="../images/oslviewer/Render_01_after.png"
+            data-before-title="Render06: Baseline"
+            data-after-title="OSL Beauty Render">
+            OSL Before vs After (S3)
+          </button>
+        </div>
+
         <div class="toolbar-group">
           <button type="button" id="btn-fullscreen" class="action-icon-btn" title="Toggle Fullscreen View">
             <i class="fa-solid fa-expand"></i>
@@ -130,10 +291,10 @@
       <div id="comparator-stage" class="comparator-stage">
         <!-- Overlay Badges -->
         <div class="badge-pill badge-before">
-          <i class="fa-solid fa-camera"></i> Before / Baseline
+          <i class="fa-solid fa-camera"></i> <span id="badge-before-txt">Render07: Raw Shading</span>
         </div>
         <div class="badge-pill badge-after">
-          <i class="fa-solid fa-sparkles"></i> After / OSL Shader
+          <i class="fa-solid fa-sparkles"></i> <span id="badge-after-txt">Render08: Post Render</span>
         </div>
 
         <!-- Diff Map Active Banner -->
@@ -144,14 +305,14 @@
 
         <!-- Image Canvas -->
         <div id="comparison-box" class="comparison-box">
-          <!-- Bottom/Base Layer: After Image -->
+          <!-- Bottom Layer: After Image -->
           <div class="layer-after">
-            <img id="img-after" src="../images/oslviewer/Render_01_after.png" alt="Render 01 After - OSL Shader" />
+            <img id="img-after" src="../images/oslviewer/Render08.png" alt="Render08: Post Render" />
           </div>
 
-          <!-- Top Overlay Layer: Before Image (Pixel-Perfect Overlay clipped with CSS polygon) -->
+          <!-- Top Overlay Layer: Before Image -->
           <div class="layer-before">
-            <img id="img-before" src="../images/oslviewer/Render_01_before.png" alt="Render 01 Before - Baseline Reference" />
+            <img id="img-before" src="../images/oslviewer/Render07.png" alt="Render07: Raw Shading" />
           </div>
 
           <!-- Vertical Split Line -->
@@ -164,7 +325,7 @@
             </svg>
           </div>
 
-          <!-- Range Input Slider for Accessibility and Direct Manipulation -->
+          <!-- Range Input Slider -->
           <input
             type="range"
             min="0"
@@ -199,15 +360,15 @@
         </div>
       </div>
 
-      <!-- Local Drag & Drop Testing Zone (Upload & Test Your Own Renders) -->
+      <!-- Local Drag & Drop Testing Zone -->
       <div class="custom-upload-card" id="custom-upload-card">
         <div class="upload-header">
           <h3>
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span>Test Custom Renders Locally (A/B Pair)</span>
           </h3>
-          <button type="button" id="btn-reset-pair" class="btn-reset-pair" title="Reset back to default Render 01 pair">
-            <i class="fa-solid fa-rotate-left"></i> Reset to Default
+          <button type="button" id="btn-reset-pair" class="btn-reset-pair" title="Reset back to active sample pair">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Sample Pair
           </button>
         </div>
         <p style="font-size: 0.88rem; color: var(--text-muted);">
@@ -230,146 +391,12 @@
       </div>
     </section>
 
-    <!-- 2. Multi-Style Layer Stack (Compare 4–6 Images On Top of Each Other) -->
-    <section id="multi-stack" class="multi-stack-section">
-      <div class="section-header">
-        <div class="section-title-wrap">
-          <h2><i class="fa-solid fa-layer-group"></i> Multi-Style Layer Stack (4–6 Images)</h2>
-          <p>Stack, blend, solo, and compare 4 to 6 different styles, AOVs, or revisions pixel-for-pixel on top of each other.</p>
-        </div>
-
-        <div class="toolbar-group">
-          <span style="font-size: 0.8rem; color: var(--text-dim);">Keys 1–6: Solo Style</span>
-        </div>
-      </div>
-
-      <!-- Multi-Toolbar: View Switcher and Playback -->
-      <div class="multi-toolbar">
-        <div class="multi-view-tabs">
-          <button type="button" class="multi-view-btn active" data-multimode="mixer">
-            <i class="fa-solid fa-sliders"></i> Layer Mixer Stack
-          </button>
-          <button type="button" class="multi-view-btn" data-multimode="curtain">
-            <i class="fa-solid fa-arrows-split-up-and-left"></i> Multi-Curtain Wipe
-          </button>
-          <button type="button" class="multi-view-btn" data-multimode="matrix">
-            <i class="fa-solid fa-table-cells"></i> Synchronized Matrix (3&times;2)
-          </button>
-        </div>
-
-        <div class="playback-controls">
-          <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through all 6 styles">
-            <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
-          </button>
-        </div>
-      </div>
-
-      <!-- Multi-Stage Card with 6 Stacked Layers -->
-      <div id="multi-stage-card" class="multi-stage-card">
-        <!-- Live Active Style Badge -->
-        <div id="multi-active-pill" class="multi-active-pill">
-          <span class="pill-num" id="active-layer-num">1</span>
-          <span id="active-layer-title">Beauty Pass (OSL Shader)</span>
-        </div>
-
-        <!-- 6-Layer Canvas (All pixel-aligned 16:9) -->
-        <div id="multi-canvas" class="multi-canvas">
-          <!-- Layer 1: Beauty Pass -->
-          <div id="stack-layer-1" class="stack-layer" style="z-index: 1; opacity: 1;">
-            <img src="../images/oslviewer/Render_01_after.png" alt="Style 1: Beauty Pass" />
-          </div>
-
-          <!-- Layer 2: Baseline Reference -->
-          <div id="stack-layer-2" class="stack-layer" style="z-index: 2; opacity: 0;">
-            <img src="../images/oslviewer/Render_01_before.png" alt="Style 2: Baseline Reference" />
-          </div>
-
-          <!-- Layer 3: Difference Heatmap -->
-          <div id="stack-layer-3" class="stack-layer" style="z-index: 3; opacity: 0; mix-blend-mode: difference; filter: contrast(180%) brightness(140%);">
-            <img src="../images/oslviewer/Render_01_before.png" alt="Style 3: Difference Heatmap" />
-          </div>
-
-          <!-- Layer 4: Specular / Micro-Roughness -->
-          <div id="stack-layer-4" class="stack-layer" style="z-index: 4; opacity: 0; filter: contrast(220%) brightness(120%) grayscale(60%);">
-            <img src="../images/oslviewer/Render_01_after.png" alt="Style 4: Specular Pass" />
-          </div>
-
-          <!-- Layer 5: Clay / Surface Form -->
-          <div id="stack-layer-5" class="stack-layer" style="z-index: 5; opacity: 0; filter: grayscale(100%) contrast(110%) brightness(95%);">
-            <img src="../images/oslviewer/Render_01_after.png" alt="Style 5: Clay Form" />
-          </div>
-
-          <!-- Layer 6: Silhouette / Edge Contour -->
-          <div id="stack-layer-6" class="stack-layer" style="z-index: 6; opacity: 0; filter: invert(85%) hue-rotate(180deg) contrast(140%);">
-            <img src="../images/oslviewer/Render_01_after.png" alt="Style 6: Silhouette Pass" />
-          </div>
-
-          <!-- Container for draggable Multi-Curtain vertical dividers -->
-          <div id="multi-curtain-dividers" class="multi-curtain-dividers" style="display: none;"></div>
-        </div>
-
-        <!-- Synchronized Matrix Grid View (3x2) -->
-        <div id="matrix-grid-container" class="matrix-grid-container">
-          <!-- Populated dynamically by viewer.js with all 6 active style layers -->
-        </div>
-
-        <!-- Continuous Scrubber Strip (Fluidly cross-fade from style 1 to 6) -->
-        <div class="scrub-bar-strip">
-          <div style="font-size: 0.84rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
-            <i class="fa-solid fa-wave-square" style="color: var(--accent-cyan);"></i> Style Scrub:
-          </div>
-          <div class="scrub-slider-wrap">
-            <input type="range" id="scrub-range-slider" class="scrub-slider-track" min="1" max="6" step="0.02" value="1">
-            <div class="scrub-ticks">
-              <span class="scrub-tick-item active" data-scrub="1">[1] Beauty</span>
-              <span class="scrub-tick-item" data-scrub="2">[2] Baseline</span>
-              <span class="scrub-tick-item" data-scrub="3">[3] Diff Map</span>
-              <span class="scrub-tick-item" data-scrub="4">[4] Specular</span>
-              <span class="scrub-tick-item" data-scrub="5">[5] Clay</span>
-              <span class="scrub-tick-item" data-scrub="6">[6] Silhouette</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Layer Compositor Deck (Photoshop / Nuke style Layer Mixer) -->
-      <div class="layer-mixer-deck">
-        <div class="deck-header">
-          <h3>
-            <i class="fa-solid fa-layer-group"></i>
-            <span>Layer Compositing Deck</span>
-          </h3>
-          <span class="deck-quick-hotkeys">
-            Press keys <strong>1, 2, 3, 4, 5, 6</strong> on your keyboard to instantly solo any style
-          </span>
-        </div>
-
-        <!-- 6 Layer Rows List -->
-        <div class="layer-rows-list" id="layer-rows-list">
-          <!-- Dynamically managed by viewer.js -->
-        </div>
-
-        <!-- Bulk Multi-Image Uploader Dropzone -->
-        <div class="bulk-uploader-card" id="bulk-uploader-card">
-          <i class="fa-solid fa-images"></i>
-          <h4>Drop 4 to 6 Images Here at Once</h4>
-          <p>
-            Drag and drop up to 6 image files (or click to browse). They will automatically populate Style Layers 1 through 6 for instant pixel comparison.
-          </p>
-          <input type="file" id="bulk-file-input" class="file-hidden-input" multiple accept="image/*">
-          <button type="button" id="btn-reset-multi-defaults" class="btn-reset-pair" style="margin-top: 0.4rem;">
-            <i class="fa-solid fa-rotate-left"></i> Reset to Default 6 Passes
-          </button>
-        </div>
-      </div>
-    </section>
-
     <!-- 3. Video Showcase Section -->
     <section id="video-showcase" class="video-showcase-section">
       <div class="section-header">
         <div class="section-title-wrap">
           <h2><i class="fa-solid fa-film"></i> Video Demonstration &amp; Shader Breakdown</h2>
-          <p>Watch the dynamic shader attributes, lighting response, and camera rotation in motion.</p>
+          <p>Watch dynamic shader attributes, lighting response, and camera rotation in motion.</p>
         </div>
       </div>
 
@@ -399,7 +426,7 @@
         <div class="video-sidebar-list">
           <a href="https://youtu.be/dzqDU9efnnk" target="_blank" class="video-side-card" rel="noopener noreferrer">
             <div class="side-thumb-box">
-              <img src="../images/oslviewer/Render_01_after.png" alt="Demo thumbnail">
+              <img src="../images/oslviewer/Render08.png" alt="Demo thumbnail">
               <span class="play-icon"><i class="fa-solid fa-play"></i></span>
             </div>
             <div class="side-info">
@@ -410,7 +437,7 @@
 
           <a href="https://youtu.be/b1LAqVXkznk" target="_blank" class="video-side-card" rel="noopener noreferrer">
             <div class="side-thumb-box">
-              <img src="../images/oslviewer/Render_01_before.png" alt="Portfolio reel thumbnail">
+              <img src="../images/oslviewer/Render07.png" alt="Portfolio reel thumbnail">
               <span class="play-icon"><i class="fa-solid fa-play"></i></span>
             </div>
             <div class="side-info">
@@ -419,7 +446,6 @@
             </div>
           </a>
 
-          <!-- Video Upload Template Note -->
           <div class="video-side-card" style="cursor: default; border-style: dashed;">
             <div class="side-thumb-box" style="background: rgba(0, 240, 255, 0.08);">
               <i class="fa-solid fa-video" style="font-size: 1.5rem; color: var(--accent-cyan);"></i>
@@ -433,77 +459,321 @@
       </div>
     </section>
 
-    <!-- 4. Multi-Pass Render Gallery -->
+    <!-- 4. Ordered Passes Gallery Grouped by Sample -->
     <section id="gallery" class="gallery-section">
       <div class="section-header">
         <div class="section-title-wrap">
-          <h2><i class="fa-solid fa-images"></i> Project Passes &amp; Shot Gallery</h2>
-          <p>Inspect multi-pass AOVs, texture maps, and additional render angles. Click to load into comparator or enlarge.</p>
+          <h2><i class="fa-solid fa-images"></i> Project Passes Gallery (Multiple Samples)</h2>
+          <p>All project passes organized in chronological render pipeline order across distinct samples.</p>
         </div>
       </div>
 
+      <!-- Sample Set 1: OptiX Ray-Tracing Passes (1920x1080) -->
+      <div class="gallery-sample-header">
+        <div>
+          <h3><i class="fa-solid fa-layer-group" style="color: var(--accent-cyan);"></i> Sample Set 1: OptiX Ray-Tracing Pipeline</h3>
+          <p>Chronological progression: Raw Shading &rarr; Depth Buffer &rarr; DOF Debug &rarr; Post-Processed Final (1920&times;1080)</p>
+        </div>
+        <button type="button" class="sample-btn" data-sample="optix">
+          <i class="fa-solid fa-sliders"></i> Load Sample 1 in Stack
+        </button>
+      </div>
+
       <div class="gallery-grid">
-        <!-- Card 1: Hero Render 01 (After) -->
+        <!-- Pass 1: Render07 Raw -->
         <div class="gallery-card">
           <div class="gallery-card-thumb">
-            <img src="../images/oslviewer/Render_01_after.png" alt="Render 01 - OSL Shader">
-            <span class="thumb-badge">Final OSL Shader</span>
+            <img src="../images/oslviewer/Render07.png" alt="Render07 Raw Shading">
+            <span class="thumb-badge">Step 1: Raw Shading</span>
             <div class="thumb-overlay-action">
               <button
                 type="button"
                 class="overlay-btn overlay-btn-primary btn-load-compare"
-                data-before="../images/oslviewer/Render_01_before.png"
-                data-after="../images/oslviewer/Render_01_after.png">
+                data-before="../images/oslviewer/Render07.png"
+                data-after="../images/oslviewer/Render08.png"
+                data-before-title="Render07: Raw Shading"
+                data-after-title="Render08: Post Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render07.png"
+                data-title="Step 1: Render07 &mdash; OptiX Raw Ray-Traced Shading">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render07 &mdash; Raw Ray-Traced Shading</h4>
+            <p>Direct un-tone-mapped output from the OptiX ray-tracing pipeline core.</p>
+          </div>
+        </div>
+
+        <!-- Pass 2: Render04 Depth -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render04.png" alt="Render04 Z-Depth">
+            <span class="thumb-badge">Step 2: Z-Depth AOV</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render04.png"
+                data-after="../images/oslviewer/Render08.png"
+                data-before-title="Render04: Depth Buffer"
+                data-after-title="Render08: Post Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render04.png"
+                data-title="Step 2: Render04 &mdash; OptiX Z-Depth Buffer Pass">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render04 &mdash; Z-Depth Buffer Pass</h4>
+            <p>Depth pass used for atmospheric fog, distance culling, and camera depth-of-field.</p>
+          </div>
+        </div>
+
+        <!-- Pass 3: Render05 DOF Debug -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render05.png" alt="Render05 DOF Debug">
+            <span class="thumb-badge">Step 3: DOF Debug</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render05.png"
+                data-after="../images/oslviewer/Render08.png"
+                data-before-title="Render05: DOF Debug"
+                data-after-title="Render08: Post Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render05.png"
+                data-title="Step 3: Render05 &mdash; Depth of Field Debug Pass">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render05 &mdash; Depth of Field Debug</h4>
+            <p>Visualizing lens circle of confusion, focal plane, and aperture blur response.</p>
+          </div>
+        </div>
+
+        <!-- Pass 4: Render08 Post Final -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render08.png" alt="Render08 Post-Processed">
+            <span class="thumb-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">Step 4: Post Final</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render07.png"
+                data-after="../images/oslviewer/Render08.png"
+                data-before-title="Render07: Raw Shading"
+                data-after-title="Render08: Post Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render08.png"
+                data-title="Step 4: Render08 &mdash; OptiX Post-Processed Final Render">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render08 &mdash; Final Post-Processed Render</h4>
+            <p>Final beauty frame with tone-mapping, color grading, and lens effects.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Set 2: Viewport Flat Shading (960x540) -->
+      <div class="gallery-sample-header">
+        <div>
+          <h3><i class="fa-solid fa-vector-square" style="color: var(--accent-amber);"></i> Sample Set 2: Viewport Flat Shading</h3>
+          <p>Chronological progression: Angle A &rarr; Flat Base &rarr; Flat Post-Processed (960&times;540)</p>
+        </div>
+        <button type="button" class="sample-btn" data-sample="flat">
+          <i class="fa-solid fa-sliders"></i> Load Sample 2 in Stack
+        </button>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Pass 1: Render01 -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render01.png" alt="Render01 Flat Angle A">
+            <span class="thumb-badge">Step 1: Flat Angle A</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render01.png"
+                data-after="../images/oslviewer/Render03.png"
+                data-before-title="Render01: Flat A"
+                data-after-title="Render03: Flat Post">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render01.png"
+                data-title="Step 1: Render01 &mdash; Flat Shaded Angle A">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render01 &mdash; Flat Shaded (Angle A)</h4>
+            <p>Initial viewport geometric shading angle.</p>
+          </div>
+        </div>
+
+        <!-- Pass 2: Render02 -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render02.png" alt="Render02 Flat Base">
+            <span class="thumb-badge">Step 2: Flat Base B</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render02.png"
+                data-after="../images/oslviewer/Render03.png"
+                data-before-title="Render02: Flat Base"
+                data-after-title="Render03: Flat Post">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render02.png"
+                data-title="Step 2: Render02 &mdash; Flat Shaded Base Angle B">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render02 &mdash; Flat Shaded Base (Angle B)</h4>
+            <p>Raw viewport geometry and albedo without tone-mapping.</p>
+          </div>
+        </div>
+
+        <!-- Pass 3: Render03 -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render03.png" alt="Render03 Flat Post">
+            <span class="thumb-badge">Step 3: Flat Post B</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render02.png"
+                data-after="../images/oslviewer/Render03.png"
+                data-before-title="Render02: Flat Base"
+                data-after-title="Render03: Flat Post">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render03.png"
+                data-title="Step 3: Render03 &mdash; Flat Post-Processed Angle B">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render03 &mdash; Flat Post-Processed (Angle B)</h4>
+            <p>Post-processed flat viewport shading with edge clarity.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Set 3: OSL Shader Benchmark (1920x1080) -->
+      <div class="gallery-sample-header">
+        <div>
+          <h3><i class="fa-solid fa-sparkles" style="color: #a855f7;"></i> Sample Set 3: OSL Shader Benchmark</h3>
+          <p>Chronological progression: Baseline Ground Truth &rarr; Custom OSL Shading (1920&times;1080)</p>
+        </div>
+        <button type="button" class="sample-btn" data-sample="osl">
+          <i class="fa-solid fa-sliders"></i> Load Sample 3 in Stack
+        </button>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Pass 1: Render06 Baseline -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render06.png" alt="Render06 Baseline">
+            <span class="thumb-badge" style="color: var(--accent-amber); border-color: rgba(255, 183, 0, 0.3);">Step 1: Baseline</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render06.png"
+                data-after="../images/oslviewer/Render_01_after.png"
+                data-before-title="Render06: Baseline"
+                data-after-title="OSL Beauty Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render06.png"
+                data-title="Step 1: Render06 &mdash; Baseline Reference">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render06 &mdash; Baseline Ground Truth</h4>
+            <p>Ground-truth reference render used to benchmark OSL shader modifications.</p>
+          </div>
+        </div>
+
+        <!-- Pass 2: Render After OSL -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render_01_after.png" alt="OSL Beauty Render">
+            <span class="thumb-badge">Step 2: OSL Beauty</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render06.png"
+                data-after="../images/oslviewer/Render_01_after.png"
+                data-before-title="Render06: Baseline"
+                data-after-title="OSL Beauty Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
                 type="button"
                 class="overlay-btn overlay-btn-secondary btn-open-lightbox"
                 data-full="../images/oslviewer/Render_01_after.png"
-                data-title="Render 01 - Final OSL Shader">
+                data-title="Step 2: OSL Beauty Shading Pass">
                 <i class="fa-solid fa-magnifying-glass-plus"></i> View
               </button>
             </div>
           </div>
           <div class="gallery-card-info">
-            <h4>Render 01 &mdash; Beauty Pass (OSL)</h4>
-            <p>Full shader evaluation with procedural micro-roughness and energy-conserving specular distribution.</p>
+            <h4>Render After &mdash; OSL Beauty Shading</h4>
+            <p>Final procedural OSL shader evaluation with micro-surface specular response.</p>
           </div>
-        </div>
-
-        <!-- Card 2: Hero Render 01 (Before / Reference) -->
-        <div class="gallery-card">
-          <div class="gallery-card-thumb">
-            <img src="../images/oslviewer/Render_01_before.png" alt="Render 01 - Baseline Reference">
-            <span class="thumb-badge" style="color: var(--accent-amber); border-color: rgba(255, 183, 0, 0.3);">Baseline Reference</span>
-            <div class="thumb-overlay-action">
-              <button
-                type="button"
-                class="overlay-btn overlay-btn-primary btn-load-compare"
-                data-before="../images/oslviewer/Render_01_before.png"
-                data-after="../images/oslviewer/Render_01_after.png">
-                <i class="fa-solid fa-sliders"></i> Compare
-              </button>
-              <button
-                type="button"
-                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
-                data-full="../images/oslviewer/Render_01_before.png"
-                data-title="Render 01 - Baseline Reference">
-                <i class="fa-solid fa-magnifying-glass-plus"></i> View
-              </button>
-            </div>
-          </div>
-          <div class="gallery-card-info">
-            <h4>Render 01 &mdash; Baseline Reference</h4>
-            <p>Original input render pass used as the ground-truth benchmark for differential shading comparison.</p>
-          </div>
-        </div>
-
-        <!-- Card 3: Easy Add Template -->
-        <div class="gallery-card gallery-card-add" onclick="document.getElementById('multi-stack').scrollIntoView({behavior: 'smooth'})">
-          <i class="fa-solid fa-folder-plus"></i>
-          <h4>Upload 4–6 Renders</h4>
-          <p>Add new images to <code>images/oslviewer/</code> or drop them in the 4–6 layer stack above to compare.</p>
         </div>
       </div>
     </section>
@@ -521,13 +791,13 @@
         <div class="spec-card">
           <div class="spec-icon"><i class="fa-solid fa-crosshairs"></i></div>
           <h3>1:1 Subpixel Accuracy</h3>
-          <p>Zero optical distortion. All 6 layers are anchored at true 16:9 1920&times;1080 resolution with hardware-accelerated clipping polygons.</p>
+          <p>Zero optical distortion. All layers are anchored at true native resolution with hardware-accelerated clipping polygons.</p>
         </div>
 
         <div class="spec-card">
           <div class="spec-icon"><i class="fa-solid fa-layer-group"></i></div>
-          <h3>Multi-Style Compositor</h3>
-          <p>Compare up to 6 styles on top of each other with independent opacity curves, blend modes (Difference, Multiply, Screen), and hotkey soloing.</p>
+          <h3>Ordered Multi-Sample Stacking</h3>
+          <p>Organize passes into logical shot samples with instant scrubber interpolation, multi-wipe curtains, and keyboard hotkeys.</p>
         </div>
 
         <div class="spec-card">
