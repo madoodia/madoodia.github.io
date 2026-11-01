@@ -1,0 +1,25 @@
+{
+  "project": "OSL Studio",
+  "folders": [
+    {
+      "id": "Viewport01",
+      "title": "Viewport 01",
+      "files": [
+        "01.wireframe.png",
+        "02.3d.png",
+        "03.zdepth.png",
+        "04.render.png",
+        "05.debug.dof.png",
+        "06.render.dof.png"
+      ]
+    },
+    {
+      "id": "Viewport2",
+      "title": "Viewport 2",
+      "files": [
+        "01.debug.dof.png",
+        "02.render.dof.png"
+      ]
+    }
+  ]
+}

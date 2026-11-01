@@ -1,378 +1,79 @@
 /**
- * OSL Shader Studio & Multi-Style Interactive Viewer Controller
- * Multiple Ordered Samples Support
+ * OSL Studio - Advanced LookDev & Multi-Pass Interactive Inspection
+ * Dynamic Viewport Slides, Multi-Curtain Cascading Wipes, and Local A/B Testing
  * madoodia.com - Reza Aarabi
  */
 
 document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
-  // Sample Data Model: Organizes Renders in Logical & Pipeline Order
+  // 1. Dynamic Manifest & Layer Model
   // ==========================================================================
-  const SAMPLES = {
-    optix: {
-      id: "optix",
-      title: "Sample 1: OptiX Ray-Tracing Passes",
-      subtitle: "High-resolution 1920x1080 pipeline: Depth Buffer → DOF Debug → Raw Shading → Post-Processed",
-      layers: [
-        { id: 1, renderNum: "04", name: "Render04: Z-Depth Buffer Pass", tag: "Render04: Depth Pass", shortTitle: "Render04: Depth", src: "../images/oslviewer/Render04.png" },
-        { id: 2, renderNum: "05", name: "Render05: Depth of Field Debug", tag: "Render05: DOF Debug", shortTitle: "Render05: DOF", src: "../images/oslviewer/Render05.png" },
-        { id: 3, renderNum: "07", name: "Render07: OptiX Raw Ray-Traced Shading", tag: "Render07: Raw Shading", shortTitle: "Render07: Raw", src: "../images/oslviewer/Render07.png" },
-        { id: 4, renderNum: "08", name: "Render08: OptiX Post-Processed Render", tag: "Render08: Post Final", shortTitle: "Render08: Post", src: "../images/oslviewer/Render08.png" }
-      ],
-      comparatorPair: {
-        before: "../images/oslviewer/Render04.png",
-        after: "../images/oslviewer/Render08.png",
-        beforeTitle: "Render04: Depth",
-        afterTitle: "Render08: Post"
+  const DEFAULT_MANIFEST = {
+    "project": "OSL Studio",
+    "folders": [
+      {
+        "id": "Viewport01",
+        "title": "Viewport 01",
+        "files": [
+          "01.wireframe.png",
+          "02.3d.png",
+          "03.zdepth.png",
+          "04.render.png",
+          "05.debug.dof.png",
+          "06.render.dof.png"
+        ]
+      },
+      {
+        "id": "Viewport2",
+        "title": "Viewport 2",
+        "files": [
+          "01.debug.dof.png",
+          "02.render.dof.png"
+        ]
       }
-    },
-    flat: {
-      id: "flat",
-      title: "Sample 2: Viewport Flat Shading",
-      subtitle: "Geometry & viewport shading inspection: Angle A → Flat Base → Flat Post",
-      layers: [
-        { id: 1, renderNum: "01", name: "Render01: Flat Shaded (Angle A)", tag: "Render01: Flat A", shortTitle: "Render01: Flat A", src: "../images/oslviewer/Render01.png" },
-        { id: 2, renderNum: "02", name: "Render02: Flat Shaded Base (Angle B)", tag: "Render02: Flat Base", shortTitle: "Render02: Base", src: "../images/oslviewer/Render02.png" },
-        { id: 3, renderNum: "03", name: "Render03: Flat Post-Processed (Angle B)", tag: "Render03: Flat Post", shortTitle: "Render03: Post", src: "../images/oslviewer/Render03.png" }
-      ],
-      comparatorPair: {
-        before: "../images/oslviewer/Render02.png",
-        after: "../images/oslviewer/Render03.png",
-        beforeTitle: "Render02: Flat Base",
-        afterTitle: "Render03: Flat Post"
-      }
-    },
-    osl: {
-      id: "osl",
-      title: "Sample 3: OSL Shader Benchmark",
-      subtitle: "Differential shading evaluation: Baseline Reference vs Custom OSL Shader",
-      layers: [
-        { id: 1, renderNum: "06", name: "Render06: Baseline Ground Truth", tag: "Render06: Baseline", shortTitle: "Render06: Baseline", src: "../images/oslviewer/Render06.png" },
-        { id: 2, renderNum: "After", name: "Render After: OSL Beauty Shading", tag: "OSL Beauty Pass", shortTitle: "OSL Beauty", src: "../images/oslviewer/Render_01_after.png" }
-      ],
-      comparatorPair: {
-        before: "../images/oslviewer/Render06.png",
-        after: "../images/oslviewer/Render_01_after.png",
-        beforeTitle: "Render06: Baseline",
-        afterTitle: "OSL Beauty Render"
-      }
-    },
-    all: {
-      id: "all",
-      title: "Sample 4: Complete Sequence (Render 01–08)",
-      subtitle: "All 8 project renders arranged in numerical order",
-      layers: [
-        { id: 1, renderNum: "01", name: "Render01: Flat Angle A", tag: "Render01: Flat A", shortTitle: "Render01", src: "../images/oslviewer/Render01.png" },
-        { id: 2, renderNum: "02", name: "Render02: Flat Base B", tag: "Render02: Base", shortTitle: "Render02", src: "../images/oslviewer/Render02.png" },
-        { id: 3, renderNum: "03", name: "Render03: Flat Post B", tag: "Render03: Post", shortTitle: "Render03", src: "../images/oslviewer/Render03.png" },
-        { id: 4, renderNum: "04", name: "Render04: Depth Buffer", tag: "Render04: Depth", shortTitle: "Render04", src: "../images/oslviewer/Render04.png" },
-        { id: 5, renderNum: "05", name: "Render05: DOF Debug Pass", tag: "Render05: DOF", shortTitle: "Render05", src: "../images/oslviewer/Render05.png" },
-        { id: 6, renderNum: "06", name: "Render06: Baseline Reference", tag: "Render06: Baseline", shortTitle: "Render06", src: "../images/oslviewer/Render06.png" },
-        { id: 7, renderNum: "07", name: "Render07: Raw Shading", tag: "Render07: Raw", shortTitle: "Render07", src: "../images/oslviewer/Render07.png" },
-        { id: 8, renderNum: "08", name: "Render08: Post Final", tag: "Render08: Post", shortTitle: "Render08", src: "../images/oslviewer/Render08.png" }
-      ],
-      comparatorPair: {
-        before: "../images/oslviewer/Render04.png",
-        after: "../images/oslviewer/Render08.png",
-        beforeTitle: "Render04: Depth",
-        afterTitle: "Render08: Post"
-      }
-    }
+    ]
   };
 
-  let currentSampleKey = "optix";
-  let activeSample = SAMPLES[currentSampleKey];
-
-  // Working state for active sample layers
-  let activeLayers = [];
-
-  function loadSample(sampleKey) {
-    if (!SAMPLES[sampleKey]) return;
-    currentSampleKey = sampleKey;
-    activeSample = SAMPLES[sampleKey];
-
-    // Clone layers with default state
-    activeLayers = activeSample.layers.map((l, index) => ({
-      ...l,
-      opacity: index === 0 ? 100 : 0,
+  /**
+   * Parse layer filename: extracts sequence number and name between '##.' and '.png'
+   * Example: '04.debug.dof.png' -> num: '04', name: 'debug.dof'
+   * Guarantees no duplicated names in UI badges.
+   */
+  function parseLayerFile(folderId, filename, layerIndex) {
+    const m = filename.match(/^(\d+)\.(.+)\.(png|jpg|jpeg|webp)$/i);
+    let num, name;
+    if (m) {
+      num = m[1];
+      name = m[2]; // Clean name between ##. and .png
+    } else {
+      num = (layerIndex + 1).toString().padStart(2, "0");
+      name = filename.replace(/\.(png|jpg|jpeg|webp)$/i, "");
+    }
+    return {
+      id: layerIndex + 1,
+      num: num,
+      name: name,
+      shortTitle: name,
+      filename: filename,
+      src: `../images/oslviewer/${folderId}/${filename}`,
+      opacity: 100,
       blend: "normal",
       visible: true
-    }));
-
-    activeSoloIndex = 1;
-
-    // Update Sample Selector Buttons
-    document.querySelectorAll(".sample-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-sample") === sampleKey);
-    });
-
-    // Update A/B Comparator with this sample's hero pair
-    if (activeSample.comparatorPair) {
-      if (imgBefore) imgBefore.src = activeSample.comparatorPair.before;
-      if (imgAfter) imgAfter.src = activeSample.comparatorPair.after;
-      if (badgeBeforeTxt) badgeBeforeTxt.textContent = activeSample.comparatorPair.beforeTitle;
-      if (badgeAfterTxt) badgeAfterTxt.textContent = activeSample.comparatorPair.afterTitle;
-      updatePosition(50);
-    }
-
-    // Rebuild DOM and UI
-    buildMultiCanvasDOM();
-    buildScrubberDOM();
-
-    if (multiMode === "curtain") {
-      activeSoloIndex = null;
-      setupMultiCurtain();
-    } else {
-      renderMultiLayers();
-      toggleSolo(1);
-    }
-  }
-
-  // ==========================================================================
-  // 1. Two-Image A/B Comparator Controller
-  // ==========================================================================
-  const stage = document.getElementById("comparator-stage");
-  const compBox = document.getElementById("comparison-box");
-  const rangeInput = document.getElementById("range-slider-input");
-  const imgBefore = document.getElementById("img-before");
-  const imgAfter = document.getElementById("img-after");
-  const posDisplay = document.getElementById("slider-pct-display");
-  const flashBtn = document.getElementById("flash-compare-btn");
-  const fullscreenBtn = document.getElementById("btn-fullscreen");
-  const badgeBeforeTxt = document.getElementById("badge-before-txt");
-  const badgeAfterTxt = document.getElementById("badge-after-txt");
-
-  let currentPosition = 50;
-  let currentMode = "split";
-  let isDragging = false;
-  let isFlashing = false;
-
-  function updatePosition(pct) {
-    pct = Math.max(0, Math.min(100, pct));
-    currentPosition = pct;
-    stage.style.setProperty("--pos", `${pct}%`);
-    stage.style.setProperty("--opacity-val", `${pct}`);
-    
-    if (rangeInput && rangeInput.value != pct) {
-      rangeInput.value = pct;
-    }
-    if (posDisplay) {
-      posDisplay.textContent = `${Math.round(pct)}%`;
-    }
-  }
-
-  if (rangeInput) {
-    rangeInput.addEventListener("input", (e) => {
-      updatePosition(parseFloat(e.target.value));
-    });
-  }
-
-  function getPosFromEvent(e) {
-    const rect = compBox.getBoundingClientRect();
-    const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
-    const x = clientX - rect.left;
-    return (x / rect.width) * 100;
-  }
-
-  if (compBox) {
-    compBox.addEventListener("pointerdown", (e) => {
-      if (currentMode === "side-by-side") return;
-      isDragging = true;
-      compBox.setPointerCapture(e.pointerId);
-      updatePosition(getPosFromEvent(e));
-    });
-
-    compBox.addEventListener("pointermove", (e) => {
-      if (!isDragging || currentMode === "side-by-side") return;
-      updatePosition(getPosFromEvent(e));
-    });
-
-    const stopDragging = (e) => {
-      if (isDragging) {
-        isDragging = false;
-        try {
-          compBox.releasePointerCapture(e.pointerId);
-        } catch (err) {}
-      }
     };
-
-    compBox.addEventListener("pointerup", stopDragging);
-    compBox.addEventListener("pointercancel", stopDragging);
   }
 
-  // Quick Percentage Jump Buttons
-  document.querySelectorAll(".quick-pct-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      updatePosition(parseFloat(btn.getAttribute("data-pct")));
-    });
-  });
+  let foldersList = DEFAULT_MANIFEST.folders;
+  let currentFolderIndex = 0;
+  let currentFolder = foldersList[0];
+  let folderLayers = [];       // All layers available in the active folder
+  let selectedLayerIds = [];   // IDs of layers selected for display/curtain
+  let activeLayers = [];       // Filtered active layers, ordered by ID
+  let multiMode = "curtain";   // Default view mode: Multi-Curtain Wipe
+  let curtainPositions = [];
+  let activeSoloIndex = null;
+  let cycleInterval = null;
 
-  // Mode Selection
-  const modeButtons = document.querySelectorAll(".mode-btn");
-  modeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      modeButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      const mode = btn.getAttribute("data-mode");
-      setMode(mode);
-    });
-  });
-
-  function setMode(mode) {
-    currentMode = mode;
-    stage.classList.remove("mode-difference", "mode-opacity", "mode-side-by-side");
-    if (mode === "difference") {
-      stage.classList.add("mode-difference");
-    } else if (mode === "opacity") {
-      stage.classList.add("mode-opacity");
-    } else if (mode === "side-by-side") {
-      stage.classList.add("mode-side-by-side");
-    }
-  }
-
-  // Preset Pair Buttons for A/B Comparator
-  document.querySelectorAll(".pair-preset-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".pair-preset-btn").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const bSrc = btn.getAttribute("data-before");
-      const aSrc = btn.getAttribute("data-after");
-      const bTitle = btn.getAttribute("data-before-title") || "Before";
-      const aTitle = btn.getAttribute("data-after-title") || "After";
-
-      if (imgBefore && bSrc) imgBefore.src = bSrc;
-      if (imgAfter && aSrc) imgAfter.src = aSrc;
-      if (badgeBeforeTxt) badgeBeforeTxt.textContent = bTitle;
-      if (badgeAfterTxt) badgeAfterTxt.textContent = aTitle;
-      updatePosition(50);
-    });
-  });
-
-  // Flash A/B Toggle
-  function flashStart() {
-    isFlashing = true;
-    if (flashBtn) flashBtn.classList.add("active");
-    stage.style.setProperty("--pos", "100%");
-  }
-
-  function flashEnd() {
-    isFlashing = false;
-    if (flashBtn) flashBtn.classList.remove("active");
-    stage.style.setProperty("--pos", `${currentPosition}%`);
-  }
-
-  if (flashBtn) {
-    flashBtn.addEventListener("mousedown", flashStart);
-    flashBtn.addEventListener("mouseup", flashEnd);
-    flashBtn.addEventListener("mouseleave", () => {
-      if (isFlashing) flashEnd();
-    });
-    flashBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      flashStart();
-    });
-    flashBtn.addEventListener("touchend", flashEnd);
-  }
-
-  // Fullscreen Mode Toggle
-  if (fullscreenBtn) {
-    fullscreenBtn.addEventListener("click", () => {
-      if (!document.fullscreenElement) {
-        stage.requestFullscreen().catch((err) => console.warn(err));
-      } else {
-        document.exitFullscreen();
-      }
-    });
-
-    document.addEventListener("fullscreenchange", () => {
-      const icon = fullscreenBtn.querySelector("i");
-      if (document.fullscreenElement) {
-        icon.className = "fa-solid fa-compress";
-      } else {
-        icon.className = "fa-solid fa-expand";
-      }
-    });
-  }
-
-  // Custom 2-Image Upload Handling
-  const dropZoneBefore = document.getElementById("drop-zone-before");
-  const dropZoneAfter = document.getElementById("drop-zone-after");
-  const inputBefore = document.getElementById("input-file-before");
-  const inputAfter = document.getElementById("input-file-after");
-  const btnResetPair = document.getElementById("btn-reset-pair");
-
-  function handleFileSelect(file, targetImg, labelElem) {
-    if (!file || !file.type.startsWith("image/")) {
-      alert("Please upload a valid image file.");
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    targetImg.src = url;
-    if (labelElem) labelElem.textContent = file.name;
-  }
-
-  if (dropZoneBefore && inputBefore) {
-    dropZoneBefore.addEventListener("click", () => inputBefore.click());
-    inputBefore.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleFileSelect(e.target.files[0], imgBefore, dropZoneBefore.querySelector(".zone-label"));
-      }
-    });
-    ["dragenter", "dragover"].forEach((evt) => {
-      dropZoneBefore.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropZoneBefore.classList.add("drag-over");
-      });
-    });
-    ["dragleave", "drop"].forEach((evt) => {
-      dropZoneBefore.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropZoneBefore.classList.remove("drag-over");
-      });
-    });
-    dropZoneBefore.addEventListener("drop", (e) => {
-      if (e.dataTransfer.files.length > 0) {
-        handleFileSelect(e.dataTransfer.files[0], imgBefore, dropZoneBefore.querySelector(".zone-label"));
-      }
-    });
-  }
-
-  if (dropZoneAfter && inputAfter) {
-    dropZoneAfter.addEventListener("click", () => inputAfter.click());
-    inputAfter.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleFileSelect(e.target.files[0], imgAfter, dropZoneAfter.querySelector(".zone-label"));
-      }
-    });
-    ["dragenter", "dragover"].forEach((evt) => {
-      dropZoneAfter.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropZoneAfter.classList.add("drag-over");
-      });
-    });
-    ["dragleave", "drop"].forEach((evt) => {
-      dropZoneAfter.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropZoneAfter.classList.remove("drag-over");
-      });
-    });
-    dropZoneAfter.addEventListener("drop", (e) => {
-      if (e.dataTransfer.files.length > 0) {
-        handleFileSelect(e.dataTransfer.files[0], imgAfter, dropZoneAfter.querySelector(".zone-label"));
-      }
-    });
-  }
-
-  if (btnResetPair) {
-    btnResetPair.addEventListener("click", () => {
-      loadSample(currentSampleKey);
-    });
-  }
-
-  // ==========================================================================
-  // 2. Multi-Style Layer Stack (Ordered Samples Engine)
-  // ==========================================================================
+  // DOM Elements - Multi Stack
   const multiStageCard = document.getElementById("multi-stage-card");
   const multiCanvas = document.getElementById("multi-canvas");
   const curtainDividers = document.getElementById("multi-curtain-dividers");
@@ -383,16 +84,146 @@ document.addEventListener("DOMContentLoaded", () => {
   const activePillNum = document.getElementById("active-layer-num");
   const activePillTitle = document.getElementById("active-layer-title");
   const autoCycleBtn = document.getElementById("btn-auto-cycle");
-  const bulkFileInput = document.getElementById("bulk-file-input");
-  const bulkUploaderCard = document.getElementById("bulk-uploader-card");
-  const btnResetMulti = document.getElementById("btn-reset-multi-defaults");
+  const equalizeBtn = document.getElementById("btn-equalize-curtain");
 
-  let multiMode = "mixer"; // 'mixer', 'curtain', 'matrix'
-  let activeSoloIndex = 1;
-  let cycleInterval = null;
-  let curtainPositions = [];
+  // DOM Elements - Folder Slides Navigation
+  const folderPillsWrap = document.getElementById("folder-pills-wrap");
+  const btnPrevFolder = document.getElementById("btn-prev-folder");
+  const btnNextFolder = document.getElementById("btn-next-folder");
 
-  // Build Canvas Layers dynamically for the active sample
+  // DOM Elements - Pass Chooser (Point 5)
+  const curtainChipsContainer = document.getElementById("curtain-chips-container");
+  const btnCurtainSelectAll = document.getElementById("btn-curtain-select-all");
+  const btnCurtainSelectAB = document.getElementById("btn-curtain-select-ab");
+
+  // ==========================================================================
+  // 2. Folder Slides Navigation (Point 2)
+  // ==========================================================================
+  function renderFolderPills() {
+    if (!folderPillsWrap) return;
+    folderPillsWrap.innerHTML = "";
+    foldersList.forEach((folder, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `folder-slide-pill ${idx === currentFolderIndex ? "active" : ""}`;
+      btn.innerHTML = `
+        <i class="fa-solid fa-folder-open"></i>
+        <span class="folder-pill-name">${folder.title || folder.id}</span>
+        <span class="folder-pill-count">${folder.files.length} Passes</span>
+      `;
+      btn.addEventListener("click", () => switchFolder(idx));
+      folderPillsWrap.appendChild(btn);
+    });
+  }
+
+  function switchFolder(folderIdx) {
+    if (folderIdx < 0) folderIdx = foldersList.length - 1;
+    if (folderIdx >= foldersList.length) folderIdx = 0;
+    currentFolderIndex = folderIdx;
+    currentFolder = foldersList[folderIdx];
+
+    // Parse layers for this folder
+    folderLayers = currentFolder.files.map((file, i) => parseLayerFile(currentFolder.id, file, i));
+    
+    // Default selection: all layers in folder
+    selectedLayerIds = folderLayers.map(l => l.id);
+    activeLayers = folderLayers.slice();
+    activeSoloIndex = null;
+
+    renderFolderPills();
+    renderPassSelectorChips();
+    buildMultiCanvasDOM();
+    buildScrubberDOM();
+    setMultiMode(multiMode);
+    updateLocalTesterDefaults();
+  }
+
+  if (btnPrevFolder) {
+    btnPrevFolder.addEventListener("click", () => switchFolder(currentFolderIndex - 1));
+  }
+  if (btnNextFolder) {
+    btnNextFolder.addEventListener("click", () => switchFolder(currentFolderIndex + 1));
+  }
+
+  // ==========================================================================
+  // 3. Dynamic Pass Chooser for Multi-Curtain (Point 5)
+  // ==========================================================================
+  function renderPassSelectorChips() {
+    if (!curtainChipsContainer) return;
+    curtainChipsContainer.innerHTML = "";
+
+    folderLayers.forEach((layer) => {
+      const isSelected = selectedLayerIds.includes(layer.id);
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = `pass-chip ${isSelected ? "selected" : ""}`;
+      chip.title = `Toggle Pass ${layer.num}: ${layer.name}`;
+      chip.innerHTML = `
+        <span class="chip-check"><i class="fa-solid ${isSelected ? "fa-check" : "fa-plus"}"></i></span>
+        <span class="chip-num">${layer.num}</span>
+        <span class="chip-name">${layer.name}</span>
+      `;
+      chip.addEventListener("click", () => togglePassSelection(layer.id));
+      curtainChipsContainer.appendChild(chip);
+    });
+  }
+
+  function togglePassSelection(layerId) {
+    const idx = selectedLayerIds.indexOf(layerId);
+    if (idx >= 0) {
+      // Prevent deselecting if only 1 layer remains
+      if (selectedLayerIds.length <= 1) return;
+      selectedLayerIds.splice(idx, 1);
+    } else {
+      selectedLayerIds.push(layerId);
+    }
+
+    // Keep selected passes strictly sorted in ascending order from left to right
+    selectedLayerIds.sort((a, b) => a - b);
+    activeLayers = folderLayers.filter(l => selectedLayerIds.includes(l.id));
+
+    renderPassSelectorChips();
+    buildMultiCanvasDOM();
+    buildScrubberDOM();
+
+    if (multiMode === "curtain") {
+      setupMultiCurtain();
+    } else {
+      renderMultiLayers();
+    }
+  }
+
+  if (btnCurtainSelectAll) {
+    btnCurtainSelectAll.addEventListener("click", () => {
+      selectedLayerIds = folderLayers.map(l => l.id);
+      activeLayers = folderLayers.slice();
+      renderPassSelectorChips();
+      buildMultiCanvasDOM();
+      buildScrubberDOM();
+      if (multiMode === "curtain") setupMultiCurtain();
+      else renderMultiLayers();
+    });
+  }
+
+  if (btnCurtainSelectAB) {
+    btnCurtainSelectAB.addEventListener("click", () => {
+      if (folderLayers.length >= 2) {
+        selectedLayerIds = [folderLayers[0].id, folderLayers[folderLayers.length - 1].id];
+      } else {
+        selectedLayerIds = [folderLayers[0].id];
+      }
+      activeLayers = folderLayers.filter(l => selectedLayerIds.includes(l.id));
+      renderPassSelectorChips();
+      buildMultiCanvasDOM();
+      buildScrubberDOM();
+      if (multiMode === "curtain") setupMultiCurtain();
+      else renderMultiLayers();
+    });
+  }
+
+  // ==========================================================================
+  // 4. Multi-Canvas DOM Builder (No Duplicated Names)
+  // ==========================================================================
   function buildMultiCanvasDOM() {
     if (!multiCanvas) return;
     multiCanvas.innerHTML = "";
@@ -402,22 +233,20 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.id = `stack-layer-${layer.id}`;
       layerEl.className = "stack-layer";
       layerEl.style.zIndex = layer.id;
-      layerEl.style.opacity = layer.id === 1 ? "1" : "0";
+      layerEl.style.opacity = "1";
 
-      const numLabel = layer.renderNum ? `Render${layer.renderNum}` : `Pass ${layer.id}`;
-      const titleLabel = layer.shortTitle || layer.tag;
-
+      // Point 1: Clean badge without duplicated names
       layerEl.innerHTML = `
         <img src="${layer.src}" alt="${layer.name}" />
         <div class="slice-label-badge">
-          <span class="badge-render-num">${numLabel}</span>
-          <span class="badge-title-txt">${titleLabel}</span>
+          <span class="badge-render-num">${layer.num}</span>
+          <span class="badge-title-txt">${layer.name}</span>
         </div>
       `;
       multiCanvas.appendChild(layerEl);
     });
 
-    // Dividers container placed ON TOP of all layers in DOM order
+    // Dividers container placed on top of all canvas layers
     const dividers = document.createElement("div");
     dividers.id = "multi-curtain-dividers";
     dividers.className = "multi-curtain-dividers";
@@ -425,266 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
     multiCanvas.appendChild(dividers);
   }
 
-  // Build Continuous Scrubber DOM for active sample length
-  function buildScrubberDOM() {
-    if (!scrubSlider || !scrubTicksWrap) return;
-    const count = activeLayers.length;
-    scrubSlider.min = "1";
-    scrubSlider.max = count.toString();
-    scrubSlider.step = "0.02";
-    scrubSlider.value = "1";
-
-    scrubTicksWrap.innerHTML = "";
-    activeLayers.forEach((layer) => {
-      const tick = document.createElement("span");
-      tick.className = `scrub-tick-item ${layer.id === 1 ? "active" : ""}`;
-      tick.setAttribute("data-scrub", layer.id);
-      tick.textContent = `[${layer.id}] ${layer.tag}`;
-      tick.addEventListener("click", () => {
-        scrubSlider.value = layer.id;
-        toggleSolo(layer.id);
-      });
-      scrubTicksWrap.appendChild(tick);
-    });
-  }
-
-  // Apply Layer State to DOM
-  function renderMultiLayers() {
-    if (multiMode === "curtain") return;
-    activeLayers.forEach((layer) => {
-      const layerEl = document.getElementById(`stack-layer-${layer.id}`);
-      if (!layerEl) return;
-
-      const img = layerEl.querySelector("img");
-      if (img && img.src !== layer.src) {
-        img.src = layer.src;
-      }
-
-      if (activeSoloIndex !== null) {
-        if (layer.id === activeSoloIndex) {
-          layerEl.style.opacity = "1";
-          layerEl.style.display = "block";
-          layerEl.style.mixBlendMode = "normal";
-        } else {
-          layerEl.style.opacity = "0";
-          layerEl.style.display = "none";
-        }
-      } else {
-        layerEl.style.display = layer.visible ? "block" : "none";
-        layerEl.style.opacity = (layer.opacity / 100).toString();
-        layerEl.style.mixBlendMode = layer.blend;
-      }
-    });
-
-    renderLayerDeckUI();
-    renderMatrixUI();
-  }
-
-  // Render Layer Deck Controls
-  function renderLayerDeckUI() {
-    if (!layerRowsList) return;
-    layerRowsList.innerHTML = "";
-
-    activeLayers.forEach((layer) => {
-      const isSolo = activeSoloIndex === layer.id;
-      const row = document.createElement("div");
-      row.className = `layer-row-card ${isSolo ? "soloed" : ""} ${!layer.visible ? "hidden-layer" : ""}`;
-
-      row.innerHTML = `
-        <div class="layer-num-badge" title="Shortcut Key: ${layer.id}">${layer.id}</div>
-        <div class="layer-thumb-mini">
-          <img src="${layer.src}" alt="${layer.name}">
-        </div>
-        <div class="layer-title-box">
-          <input type="text" class="layer-name-input" value="${layer.name}" data-id="${layer.id}" title="Click to rename style">
-          <span class="layer-sub-txt">${layer.tag}</span>
-        </div>
-        <div class="layer-opacity-control">
-          <input type="range" min="0" max="100" value="${layer.opacity}" data-id="${layer.id}" class="layer-opacity-slider" title="Layer Opacity">
-          <span class="layer-opacity-val">${layer.opacity}%</span>
-        </div>
-        <select class="layer-blend-select" data-id="${layer.id}" title="Layer Blend Mode">
-          <option value="normal" ${layer.blend === "normal" ? "selected" : ""}>Normal</option>
-          <option value="difference" ${layer.blend === "difference" ? "selected" : ""}>Difference (Diff)</option>
-          <option value="multiply" ${layer.blend === "multiply" ? "selected" : ""}>Multiply</option>
-          <option value="screen" ${layer.blend === "screen" ? "selected" : ""}>Screen</option>
-          <option value="overlay" ${layer.blend === "overlay" ? "selected" : ""}>Overlay</option>
-        </select>
-        <div class="layer-btn-actions">
-          <button type="button" class="layer-icon-btn solo-btn ${isSolo ? "active" : ""}" data-id="${layer.id}" title="Solo style ${layer.id}">
-            <i class="fa-solid fa-bullseye"></i>
-          </button>
-          <button type="button" class="layer-icon-btn eye-btn ${layer.visible ? "active" : ""}" data-id="${layer.id}" title="Toggle visibility">
-            <i class="fa-regular ${layer.visible ? "fa-eye" : "fa-eye-slash"}"></i>
-          </button>
-          <label class="layer-icon-btn layer-file-btn" title="Replace image for style ${layer.id}">
-            <i class="fa-solid fa-folder-open"></i>
-            <input type="file" accept="image/*" class="replace-layer-input" data-id="${layer.id}">
-          </label>
-        </div>
-      `;
-
-      // Event Listeners
-      const nameInput = row.querySelector(".layer-name-input");
-      nameInput.addEventListener("change", (e) => {
-        layer.name = e.target.value;
-        if (activeSoloIndex === layer.id) {
-          activePillTitle.textContent = layer.name;
-        }
-        renderMatrixUI();
-      });
-
-      const opSlider = row.querySelector(".layer-opacity-slider");
-      const opVal = row.querySelector(".layer-opacity-val");
-      opSlider.addEventListener("input", (e) => {
-        const val = parseInt(e.target.value, 10);
-        layer.opacity = val;
-        opVal.textContent = `${val}%`;
-        const layerEl = document.getElementById(`stack-layer-${layer.id}`);
-        if (layerEl && activeSoloIndex === null) {
-          layerEl.style.opacity = (val / 100).toString();
-        }
-      });
-
-      const blendSel = row.querySelector(".layer-blend-select");
-      blendSel.addEventListener("change", (e) => {
-        layer.blend = e.target.value;
-        const layerEl = document.getElementById(`stack-layer-${layer.id}`);
-        if (layerEl) layerEl.style.mixBlendMode = layer.blend;
-      });
-
-      const soloBtn = row.querySelector(".solo-btn");
-      soloBtn.addEventListener("click", () => {
-        toggleSolo(layer.id);
-      });
-
-      const eyeBtn = row.querySelector(".eye-btn");
-      eyeBtn.addEventListener("click", () => {
-        layer.visible = !layer.visible;
-        renderMultiLayers();
-      });
-
-      const fileInput = row.querySelector(".replace-layer-input");
-      fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length > 0) {
-          const file = e.target.files[0];
-          layer.src = URL.createObjectURL(file);
-          layer.name = file.name.replace(/\.[^/.]+$/, "");
-          renderMultiLayers();
-        }
-      });
-
-      layerRowsList.appendChild(row);
-    });
-  }
-
-  // Render Synchronized Matrix View
-  function renderMatrixUI() {
-    if (!matrixContainer) return;
-    matrixContainer.innerHTML = "";
-
-    activeLayers.forEach((layer) => {
-      const cell = document.createElement("div");
-      cell.className = "matrix-cell";
-      cell.innerHTML = `
-        <div class="matrix-thumb-wrap">
-          <img src="${layer.src}" alt="${layer.name}">
-          <span class="matrix-badge">${layer.tag}</span>
-        </div>
-        <div class="matrix-footer">
-          <span class="layer-name-txt">${layer.name}</span>
-          <button type="button" class="matrix-solo-btn" data-id="${layer.id}">
-            <i class="fa-solid fa-bullseye"></i> Solo
-          </button>
-        </div>
-      `;
-
-      cell.querySelector(".matrix-solo-btn").addEventListener("click", () => {
-        setMultiMode("mixer");
-        toggleSolo(layer.id);
-      });
-
-      matrixContainer.appendChild(cell);
-    });
-  }
-
-  // Toggle Solo for a Style
-  function toggleSolo(layerId) {
-    if (multiMode === "curtain") {
-      setMultiMode("mixer");
-      const mixerBtn = document.querySelector('[data-multimode="mixer"]');
-      if (mixerBtn) {
-        document.querySelectorAll(".multi-view-btn").forEach((b) => b.classList.remove("active"));
-        mixerBtn.classList.add("active");
-      }
-    }
-    if (activeSoloIndex === layerId && activeLayers.length > 1) {
-      activeSoloIndex = null;
-      activePillNum.textContent = "Mix";
-      activePillTitle.textContent = "Custom Composite Stack";
-    } else {
-      activeSoloIndex = layerId;
-      activePillNum.textContent = layerId;
-      const target = activeLayers.find((l) => l.id === layerId);
-      activePillTitle.textContent = target ? target.name : `Pass ${layerId}`;
-      if (scrubSlider) scrubSlider.value = layerId;
-      updateScrubTicks(layerId);
-    }
-    renderMultiLayers();
-  }
-
-  // Multi-View Mode Switcher (Mixer, Curtain, Matrix)
-  const multiViewBtns = document.querySelectorAll(".multi-view-btn");
-  multiViewBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      multiViewBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      const mode = btn.getAttribute("data-multimode");
-      setMultiMode(mode);
-    });
-  });
-
-  function setMultiMode(mode) {
-    multiMode = mode;
-    multiStageCard.classList.remove("view-curtain", "view-matrix");
-    
-    const dividers = document.getElementById("multi-curtain-dividers");
-    if (dividers) dividers.style.display = "none";
-
-    const equalizeBtn = document.getElementById("btn-equalize-curtain");
-    if (equalizeBtn) {
-      equalizeBtn.style.display = (mode === "curtain") ? "inline-flex" : "none";
-    }
-    
-    activeLayers.forEach((l) => {
-      const layerEl = document.getElementById(`stack-layer-${l.id}`);
-      if (layerEl) {
-        layerEl.style.clipPath = "none";
-        const badge = layerEl.querySelector(".slice-label-badge");
-        if (badge) {
-          badge.style.left = "";
-          badge.style.maxWidth = "";
-          badge.style.opacity = "";
-        }
-      }
-    });
-
-    if (mode === "curtain") {
-      activeSoloIndex = null;
-      multiStageCard.classList.add("view-curtain");
-      setupMultiCurtain();
-    } else if (mode === "matrix") {
-      multiStageCard.classList.add("view-matrix");
-      renderMatrixUI();
-    } else {
-      renderMultiLayers();
-      if (activeSoloIndex !== null) {
-        toggleSolo(activeSoloIndex);
-      }
-    }
-  }
-
-  // Push & Accordion Cascade Logic for Curtain Dividers
+  // ==========================================================================
+  // 5. Multi-Curtain Mode (Cascading Push & Vertically Staggered Knobs)
+  // ==========================================================================
   function pushCurtainDividers(dragIdx, targetPct) {
     const M = activeLayers.length - 1;
     if (M < 1) return;
@@ -700,14 +272,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     curtainPositions[dragIdx] = clamped;
 
-    // Push right: forward accordion cascade to end
+    // Push right: forward accordion cascade
     for (let j = dragIdx + 1; j < M; j++) {
       if (curtainPositions[j] < curtainPositions[j - 1] + minGap) {
         curtainPositions[j] = curtainPositions[j - 1] + minGap;
       }
     }
 
-    // Push left: backward accordion cascade to start
+    // Push left: backward accordion cascade
     for (let j = dragIdx - 1; j >= 0; j--) {
       if (curtainPositions[j] > curtainPositions[j + 1] - minGap) {
         curtainPositions[j] = curtainPositions[j + 1] - minGap;
@@ -719,7 +291,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function updateCurtainSlices() {
     const count = activeLayers.length;
-    if (count < 2) return;
+    if (count === 0) return;
+
+    if (count === 1) {
+      // Single pass selected: display full layer
+      const singleLayer = activeLayers[0];
+      const layerEl = document.getElementById(`stack-layer-${singleLayer.id}`);
+      if (layerEl) {
+        layerEl.style.clipPath = "none";
+        layerEl.style.opacity = "1";
+        layerEl.style.display = "block";
+        const badge = layerEl.querySelector(".slice-label-badge");
+        if (badge) {
+          badge.style.left = "calc(0% + 14px)";
+          badge.style.maxWidth = "calc(100% - 28px)";
+          badge.style.opacity = "1";
+        }
+      }
+      return;
+    }
 
     activeLayers.forEach((layer, idx) => {
       const layerEl = document.getElementById(`stack-layer-${layer.id}`);
@@ -751,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Setup Multi-Curtain Mode (Interactive Draggable Vertical Dividers)
   function setupMultiCurtain() {
     const dividers = document.getElementById("multi-curtain-dividers");
     if (!dividers) return;
@@ -760,7 +349,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const count = activeLayers.length;
     if (count < 2) {
-      dividers.innerHTML = '<div class="curtain-divider-tag" style="top: 1rem; left: 50%; transform: translateX(-50%);">Curtain requires at least 2 layers</div>';
+      curtainPositions = [];
+      updateCurtainSlices();
+      if (activePillNum && activePillTitle && activeLayers[0]) {
+        activePillNum.textContent = activeLayers[0].num;
+        activePillTitle.textContent = `${activeLayers[0].num}. ${activeLayers[0].name}`;
+      }
       return;
     }
 
@@ -772,19 +366,19 @@ document.addEventListener("DOMContentLoaded", () => {
       curtainPositions.push(((k + 1) * 100) / count);
     }
 
-    // Build interactive draggable divider handles with vertically staggered knob positions
+    // Build interactive draggable divider handles with vertically staggered knobs
     for (let k = 0; k < M; k++) {
       const divLine = document.createElement("div");
       divLine.className = "curtain-divider-line";
       divLine.style.left = `${curtainPositions[k]}%`;
       divLine.style.zIndex = (40 + k).toString();
 
-      // Distribute knobs vertically between 20% and 80% so they never stack on top of each other
+      // Distribute knobs vertically between 20% and 80% so they never stack
       const topPct = (M <= 1) ? 50 : Math.round(20 + (k / (M - 1)) * 60);
 
       const prevLayer = activeLayers[k];
       const nextLayer = activeLayers[k + 1];
-      const dividerTitle = `Divider ${k + 1}: ${prevLayer.tag} | ${nextLayer.tag}`;
+      const dividerTitle = `Divider ${k + 1}: ${prevLayer.name} | ${nextLayer.name}`;
 
       divLine.innerHTML = `
         <div class="curtain-divider-knob" style="top: ${topPct}%;" aria-label="${dividerTitle}" title="${dividerTitle}">
@@ -828,9 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
       divLine.addEventListener("pointercancel", stopDrag);
 
       // Double-click resets back to equal spacing
-      divLine.addEventListener("dblclick", () => {
-        setupMultiCurtain();
-      });
+      divLine.addEventListener("dblclick", () => setupMultiCurtain());
 
       dividers.appendChild(divLine);
     }
@@ -843,7 +435,249 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Continuous Scrubber
+  // Equalize Slices Button
+  if (equalizeBtn) {
+    equalizeBtn.addEventListener("click", () => setupMultiCurtain());
+  }
+
+  // ==========================================================================
+  // 6. View Mode Switching (Multi-Curtain, Mixer, Matrix)
+  // ==========================================================================
+  const multiViewBtns = document.querySelectorAll(".multi-view-btn");
+  multiViewBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      multiViewBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const mode = btn.getAttribute("data-multimode");
+      setMultiMode(mode);
+    });
+  });
+
+  function setMultiMode(mode) {
+    multiMode = mode;
+    multiStageCard.classList.remove("view-curtain", "view-matrix");
+
+    const dividers = document.getElementById("multi-curtain-dividers");
+    if (dividers) dividers.style.display = "none";
+
+    if (equalizeBtn) {
+      equalizeBtn.style.display = (mode === "curtain") ? "inline-flex" : "none";
+    }
+
+    activeLayers.forEach((l) => {
+      const layerEl = document.getElementById(`stack-layer-${l.id}`);
+      if (layerEl) {
+        layerEl.style.clipPath = "none";
+        const badge = layerEl.querySelector(".slice-label-badge");
+        if (badge) {
+          badge.style.left = "";
+          badge.style.maxWidth = "";
+          badge.style.opacity = "";
+        }
+      }
+    });
+
+    if (mode === "curtain") {
+      activeSoloIndex = null;
+      multiStageCard.classList.add("view-curtain");
+      setupMultiCurtain();
+    } else if (mode === "matrix") {
+      multiStageCard.classList.add("view-matrix");
+      renderMatrixUI();
+    } else {
+      renderMultiLayers();
+      if (activeSoloIndex !== null) {
+        toggleSolo(activeSoloIndex);
+      }
+    }
+  }
+
+  // Apply Layer State in Composite Mixer Mode
+  function renderMultiLayers() {
+    if (multiMode === "curtain") return;
+    activeLayers.forEach((layer) => {
+      const layerEl = document.getElementById(`stack-layer-${layer.id}`);
+      if (!layerEl) return;
+
+      if (activeSoloIndex !== null) {
+        if (layer.id === activeSoloIndex) {
+          layerEl.style.opacity = "1";
+          layerEl.style.display = "block";
+          layerEl.style.mixBlendMode = "normal";
+        } else {
+          layerEl.style.opacity = "0";
+          layerEl.style.display = "none";
+        }
+      } else {
+        layerEl.style.display = layer.visible ? "block" : "none";
+        layerEl.style.opacity = (layer.opacity / 100).toString();
+        layerEl.style.mixBlendMode = layer.blend;
+      }
+    });
+
+    renderLayerDeckUI();
+    renderMatrixUI();
+  }
+
+  // Toggle Solo Layer
+  function toggleSolo(layerId) {
+    if (multiMode === "curtain") {
+      setMultiMode("mixer");
+      multiViewBtns.forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("data-multimode") === "mixer");
+      });
+    }
+
+    if (activeSoloIndex === layerId && activeLayers.length > 1) {
+      activeSoloIndex = null;
+      if (activePillNum) activePillNum.textContent = "Mix";
+      if (activePillTitle) activePillTitle.textContent = "Custom Composite Stack";
+    } else {
+      activeSoloIndex = layerId;
+      const target = activeLayers.find((l) => l.id === layerId);
+      if (activePillNum) activePillNum.textContent = target ? target.num : layerId;
+      if (activePillTitle) activePillTitle.textContent = target ? `${target.num}. ${target.name}` : `Pass ${layerId}`;
+      if (scrubSlider) scrubSlider.value = layerId;
+      updateScrubTicks(layerId);
+    }
+    renderMultiLayers();
+  }
+
+  // Render Layer Compositing Deck
+  function renderLayerDeckUI() {
+    if (!layerRowsList) return;
+    layerRowsList.innerHTML = "";
+
+    activeLayers.forEach((layer) => {
+      const isSolo = activeSoloIndex === layer.id;
+      const row = document.createElement("div");
+      row.className = `layer-row-card ${isSolo ? "soloed" : ""} ${!layer.visible ? "hidden-layer" : ""}`;
+
+      row.innerHTML = `
+        <div class="layer-num-badge" title="Shortcut Key: ${layer.id}">${layer.num}</div>
+        <div class="layer-thumb-mini">
+          <img src="${layer.src}" alt="${layer.name}">
+        </div>
+        <div class="layer-title-box">
+          <input type="text" class="layer-name-input" value="${layer.name}" data-id="${layer.id}" title="Click to rename pass">
+          <span class="layer-sub-txt">${layer.filename}</span>
+        </div>
+        <div class="layer-opacity-control">
+          <input type="range" min="0" max="100" value="${layer.opacity}" data-id="${layer.id}" class="layer-opacity-slider" title="Layer Opacity">
+          <span class="layer-opacity-val">${layer.opacity}%</span>
+        </div>
+        <select class="layer-blend-select" data-id="${layer.id}" title="Layer Blend Mode">
+          <option value="normal" ${layer.blend === "normal" ? "selected" : ""}>Normal</option>
+          <option value="difference" ${layer.blend === "difference" ? "selected" : ""}>Difference (Diff)</option>
+          <option value="multiply" ${layer.blend === "multiply" ? "selected" : ""}>Multiply</option>
+          <option value="screen" ${layer.blend === "screen" ? "selected" : ""}>Screen</option>
+          <option value="overlay" ${layer.blend === "overlay" ? "selected" : ""}>Overlay</option>
+        </select>
+        <div class="layer-btn-actions">
+          <button type="button" class="layer-icon-btn solo-btn ${isSolo ? "active" : ""}" data-id="${layer.id}" title="Solo pass ${layer.num}">
+            <i class="fa-solid fa-bullseye"></i>
+          </button>
+          <button type="button" class="layer-icon-btn eye-btn ${layer.visible ? "active" : ""}" data-id="${layer.id}" title="Toggle visibility">
+            <i class="fa-regular ${layer.visible ? "fa-eye" : "fa-eye-slash"}"></i>
+          </button>
+        </div>
+      `;
+
+      // Event Listeners for Row Controls
+      const nameInput = row.querySelector(".layer-name-input");
+      nameInput.addEventListener("change", (e) => {
+        layer.name = e.target.value;
+      });
+
+      const opSlider = row.querySelector(".layer-opacity-slider");
+      const opVal = row.querySelector(".layer-opacity-val");
+      opSlider.addEventListener("input", (e) => {
+        layer.opacity = parseInt(e.target.value, 10);
+        opVal.textContent = `${layer.opacity}%`;
+        const layerEl = document.getElementById(`stack-layer-${layer.id}`);
+        if (layerEl && multiMode !== "curtain") {
+          layerEl.style.opacity = (layer.opacity / 100).toString();
+        }
+      });
+
+      const blendSelect = row.querySelector(".layer-blend-select");
+      blendSelect.addEventListener("change", (e) => {
+        layer.blend = e.target.value;
+        const layerEl = document.getElementById(`stack-layer-${layer.id}`);
+        if (layerEl && multiMode !== "curtain") {
+          layerEl.style.mixBlendMode = layer.blend;
+        }
+      });
+
+      const soloBtn = row.querySelector(".solo-btn");
+      soloBtn.addEventListener("click", () => toggleSolo(layer.id));
+
+      const eyeBtn = row.querySelector(".eye-btn");
+      eyeBtn.addEventListener("click", () => {
+        layer.visible = !layer.visible;
+        renderMultiLayers();
+      });
+
+      layerRowsList.appendChild(row);
+    });
+  }
+
+  // Render Synchronized Matrix Grid
+  function renderMatrixUI() {
+    if (!matrixContainer) return;
+    matrixContainer.innerHTML = "";
+
+    activeLayers.forEach((layer) => {
+      const cell = document.createElement("div");
+      cell.className = "matrix-cell";
+      cell.innerHTML = `
+        <div class="matrix-thumb-wrap">
+          <img src="${layer.src}" alt="${layer.name}">
+          <span class="matrix-badge">${layer.num}</span>
+        </div>
+        <div class="matrix-footer">
+          <span class="layer-name-txt">${layer.name}</span>
+          <button type="button" class="matrix-solo-btn" data-id="${layer.id}">
+            <i class="fa-solid fa-bullseye"></i> Solo
+          </button>
+        </div>
+      `;
+
+      cell.querySelector(".matrix-solo-btn").addEventListener("click", () => {
+        setMultiMode("mixer");
+        multiViewBtns.forEach((b) => {
+          b.classList.toggle("active", b.getAttribute("data-multimode") === "mixer");
+        });
+        toggleSolo(layer.id);
+      });
+
+      matrixContainer.appendChild(cell);
+    });
+  }
+
+  // Continuous Scrubber Strip
+  function buildScrubberDOM() {
+    if (!scrubSlider || !scrubTicksWrap) return;
+    const count = activeLayers.length;
+    scrubSlider.min = "1";
+    scrubSlider.max = Math.max(1, count).toString();
+    scrubSlider.step = "0.02";
+    scrubSlider.value = "1";
+
+    scrubTicksWrap.innerHTML = "";
+    activeLayers.forEach((layer, idx) => {
+      const tick = document.createElement("span");
+      tick.className = `scrub-tick-item ${idx === 0 ? "active" : ""}`;
+      tick.setAttribute("data-scrub", idx + 1);
+      tick.textContent = `[${layer.num}] ${layer.name}`;
+      tick.addEventListener("click", () => {
+        scrubSlider.value = (idx + 1).toString();
+        toggleSolo(layer.id);
+      });
+      scrubTicksWrap.appendChild(tick);
+    });
+  }
+
   function updateScrubTicks(num) {
     document.querySelectorAll(".scrub-tick-item").forEach((tick) => {
       const scrubVal = parseInt(tick.getAttribute("data-scrub"), 10);
@@ -855,45 +689,44 @@ document.addEventListener("DOMContentLoaded", () => {
     scrubSlider.addEventListener("input", (e) => {
       if (multiMode === "curtain") {
         setMultiMode("mixer");
-        const mixerBtn = document.querySelector('[data-multimode="mixer"]');
-        if (mixerBtn) {
-          document.querySelectorAll(".multi-view-btn").forEach((b) => b.classList.remove("active"));
-          mixerBtn.classList.add("active");
-        }
+        multiViewBtns.forEach((b) => {
+          b.classList.toggle("active", b.getAttribute("data-multimode") === "mixer");
+        });
       }
       const val = parseFloat(e.target.value);
       applyScrubPosition(val);
     });
   }
 
-  function applyScrubPosition(val) {
-    updateScrubTicks(val);
+  function applyScrubPosition(pos) {
     const count = activeLayers.length;
-    const baseIdx = Math.floor(val);
-    const progress = val - baseIdx;
+    if (count <= 1) return;
+
+    const baseIndex = Math.floor(pos) - 1;
+    const fraction = pos - Math.floor(pos);
 
     activeSoloIndex = null;
-    activePillNum.textContent = Math.round(val);
-    const target = activeLayers[Math.min(count - 1, Math.max(0, Math.round(val) - 1))];
-    activePillTitle.textContent = target ? target.name : `Scrubbing ${val.toFixed(1)}`;
-
-    activeLayers.forEach((layer) => {
+    activeLayers.forEach((layer, idx) => {
       const layerEl = document.getElementById(`stack-layer-${layer.id}`);
       if (!layerEl) return;
+      layerEl.style.display = "block";
+      layerEl.style.mixBlendMode = "normal";
 
-      let op = 0;
-      if (layer.id === baseIdx) {
-        op = 1 - progress;
-      } else if (layer.id === baseIdx + 1) {
-        op = progress;
-      } else if (val >= count && layer.id === count) {
-        op = 1;
+      if (idx === baseIndex) {
+        layerEl.style.opacity = (1 - fraction).toFixed(3);
+      } else if (idx === baseIndex + 1 && baseIndex + 1 < count) {
+        layerEl.style.opacity = fraction.toFixed(3);
+      } else {
+        layerEl.style.opacity = "0";
       }
-
-      layerEl.style.opacity = op.toFixed(3);
-      layerEl.style.display = op > 0.01 ? "block" : "none";
-      layerEl.style.mixBlendMode = layer.blend;
     });
+
+    const activeLayer = activeLayers[Math.min(count - 1, Math.round(pos) - 1)];
+    if (activePillNum && activePillTitle && activeLayer) {
+      activePillNum.textContent = activeLayer.num;
+      activePillTitle.textContent = `${activeLayer.num}. ${activeLayer.name}`;
+    }
+    updateScrubTicks(pos);
   }
 
   // Auto-Cycle Turntable
@@ -902,178 +735,214 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cycleInterval) {
         clearInterval(cycleInterval);
         cycleInterval = null;
-        autoCycleBtn.classList.remove("playing");
         autoCycleBtn.innerHTML = '<i class="fa-solid fa-play"></i> Auto-Cycle Turntable';
+        autoCycleBtn.classList.remove("active");
       } else {
-        autoCycleBtn.classList.add("playing");
-        autoCycleBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause Cycle';
-        let currentCycle = activeSoloIndex || 1;
-
+        autoCycleBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause Turntable';
+        autoCycleBtn.classList.add("active");
+        let currentCycleIdx = 0;
         cycleInterval = setInterval(() => {
-          currentCycle = (currentCycle % activeLayers.length) + 1;
-          toggleSolo(currentCycle);
-        }, 1200);
+          if (activeLayers.length === 0) return;
+          currentCycleIdx = (currentCycleIdx + 1) % activeLayers.length;
+          toggleSolo(activeLayers[currentCycleIdx].id);
+        }, 1400);
       }
     });
   }
 
-  // Keyboard Shortcuts (Space for A/B flip, 1-8 for Solo Styles)
-  window.addEventListener("keydown", (e) => {
-    if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  // ==========================================================================
+  // 7. Test Custom Renders Locally (A/B Pair) (Points 3, 7)
+  // ==========================================================================
+  const localImgBefore = document.getElementById("local-img-before");
+  const localImgAfter = document.getElementById("local-img-after");
+  const localBadgeBefore = document.getElementById("local-badge-before-txt");
+  const localBadgeAfter = document.getElementById("local-badge-after-txt");
+  const localLayerBefore = document.getElementById("local-layer-before");
+  const localSliderBar = document.getElementById("local-slider-bar");
+  const localSliderKnob = document.getElementById("local-slider-knob");
+  const localRangeInput = document.getElementById("local-range-slider-input");
+  const localDiffAlert = document.getElementById("local-diff-alert");
+  const localBtnReset = document.getElementById("btn-reset-local-pair");
+  const localInputFileBefore = document.getElementById("local-input-file-before");
+  const localInputFileAfter = document.getElementById("local-input-file-after");
+  const localLabelBefore = document.getElementById("local-file-before-label");
+  const localLabelAfter = document.getElementById("local-file-after-label");
+  const localBox = document.getElementById("local-comparison-box");
 
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      updatePosition(currentPosition - 5);
-    } else if (e.key === "ArrowRight") {
-      e.preventDefault();
-      updatePosition(currentPosition + 5);
-    } else if (e.code === "Space" && !isFlashing) {
-      e.preventDefault();
-      flashStart();
-    } else if (["1", "2", "3", "4", "5", "6", "7", "8"].includes(e.key)) {
+  let localSplitPct = 50;
+  let localMode = "split"; // 'split', 'difference', 'opacity'
+  let isDraggingLocal = false;
+
+  function updateLocalPosition(pct) {
+    localSplitPct = Math.max(0, Math.min(100, pct));
+    if (localRangeInput) localRangeInput.value = localSplitPct.toString();
+
+    if (localMode === "split") {
+      if (localLayerBefore) localLayerBefore.style.clipPath = `polygon(0 0, ${localSplitPct}% 0, ${localSplitPct}% 100%, 0 100%)`;
+      if (localLayerBefore) localLayerBefore.style.opacity = "1";
+      if (localSliderBar) localSliderBar.style.left = `${localSplitPct}%`;
+      if (localSliderKnob) localSliderKnob.style.left = `${localSplitPct}%`;
+    } else if (localMode === "opacity") {
+      if (localLayerBefore) localLayerBefore.style.clipPath = "none";
+      if (localLayerBefore) localLayerBefore.style.opacity = (localSplitPct / 100).toString();
+      if (localSliderBar) localSliderBar.style.left = `${localSplitPct}%`;
+      if (localSliderKnob) localSliderKnob.style.left = `${localSplitPct}%`;
+    } else if (localMode === "difference") {
+      if (localLayerBefore) localLayerBefore.style.clipPath = "none";
+      if (localLayerBefore) localLayerBefore.style.opacity = "1";
+    }
+  }
+
+  function setLocalMode(mode) {
+    localMode = mode;
+    document.querySelectorAll("[data-local-mode]").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-local-mode") === mode);
+    });
+
+    if (mode === "difference") {
+      if (localLayerBefore) {
+        localLayerBefore.style.mixBlendMode = "difference";
+        localLayerBefore.style.clipPath = "none";
+        localLayerBefore.style.opacity = "1";
+      }
+      if (localSliderBar) localSliderBar.style.display = "none";
+      if (localSliderKnob) localSliderKnob.style.display = "none";
+      if (localDiffAlert) localDiffAlert.style.display = "flex";
+    } else {
+      if (localLayerBefore) localLayerBefore.style.mixBlendMode = "normal";
+      if (localSliderBar) localSliderBar.style.display = "block";
+      if (localSliderKnob) localSliderKnob.style.display = "flex";
+      if (localDiffAlert) localDiffAlert.style.display = "none";
+      updateLocalPosition(localSplitPct);
+    }
+  }
+
+  document.querySelectorAll("[data-local-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => setLocalMode(btn.getAttribute("data-local-mode")));
+  });
+
+  document.querySelectorAll(".quick-pct-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const pct = parseFloat(btn.getAttribute("data-pct"));
+      updateLocalPosition(pct);
+    });
+  });
+
+  if (localRangeInput) {
+    localRangeInput.addEventListener("input", (e) => {
+      updateLocalPosition(parseFloat(e.target.value));
+    });
+  }
+
+  // Pointer drag for comparison box
+  if (localBox) {
+    localBox.addEventListener("pointerdown", (e) => {
+      isDraggingLocal = true;
+      localBox.setPointerCapture(e.pointerId);
+      const rect = localBox.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      updateLocalPosition(pct);
+    });
+
+    localBox.addEventListener("pointermove", (e) => {
+      if (!isDraggingLocal) return;
+      const rect = localBox.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      updateLocalPosition(pct);
+    });
+
+    const stopLocalDrag = (e) => {
+      if (isDraggingLocal) {
+        isDraggingLocal = false;
+        try {
+          localBox.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+      }
+    };
+
+    localBox.addEventListener("pointerup", stopLocalDrag);
+    localBox.addEventListener("pointercancel", stopLocalDrag);
+  }
+
+  // Local File Input Handlers (Point 3: Standard click-to-browse, no drag & drop)
+  if (localInputFileBefore) {
+    localInputFileBefore.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const url = URL.createObjectURL(file);
+        if (localImgBefore) localImgBefore.src = url;
+        if (localBadgeBefore) localBadgeBefore.textContent = file.name;
+        if (localLabelBefore) localLabelBefore.textContent = file.name;
+      }
+    });
+  }
+
+  if (localInputFileAfter) {
+    localInputFileAfter.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        const url = URL.createObjectURL(file);
+        if (localImgAfter) localImgAfter.src = url;
+        if (localBadgeAfter) localBadgeAfter.textContent = file.name;
+        if (localLabelAfter) localLabelAfter.textContent = file.name;
+      }
+    });
+  }
+
+  function updateLocalTesterDefaults() {
+    if (folderLayers.length >= 2) {
+      const first = folderLayers[0];
+      const last = folderLayers[folderLayers.length - 1];
+      if (localImgBefore) localImgBefore.src = first.src;
+      if (localImgAfter) localImgAfter.src = last.src;
+      if (localBadgeBefore) localBadgeBefore.textContent = `${first.num}. ${first.name}`;
+      if (localBadgeAfter) localBadgeAfter.textContent = `${last.num}. ${last.name}`;
+      if (localLabelBefore) localLabelBefore.textContent = `Default: ${first.filename}`;
+      if (localLabelAfter) localLabelAfter.textContent = `Default: ${last.filename}`;
+    }
+    updateLocalPosition(50);
+  }
+
+  if (localBtnReset) {
+    localBtnReset.addEventListener("click", () => updateLocalTesterDefaults());
+  }
+
+  // ==========================================================================
+  // 8. Keyboard Shortcuts
+  // ==========================================================================
+  window.addEventListener("keydown", (e) => {
+    // Digits 1-9 solo active layers
+    if (e.key >= "1" && e.key <= "9") {
       const num = parseInt(e.key, 10);
       if (num <= activeLayers.length) {
-        toggleSolo(num);
+        toggleSolo(activeLayers[num - 1].id);
       }
     }
-  });
-
-  window.addEventListener("keyup", (e) => {
-    if (e.code === "Space" && isFlashing) {
-      e.preventDefault();
-      flashEnd();
+    // Arrow Left / Right for Viewport Slides
+    if (e.altKey && e.key === "ArrowLeft") {
+      switchFolder(currentFolderIndex - 1);
+    } else if (e.altKey && e.key === "ArrowRight") {
+      switchFolder(currentFolderIndex + 1);
     }
   });
-
-  // Equalize Curtains Button
-  const equalizeBtn = document.getElementById("btn-equalize-curtain");
-  if (equalizeBtn) {
-    equalizeBtn.addEventListener("click", () => {
-      setupMultiCurtain();
-    });
-  }
-
-  // Sample Selector Button Clicks
-  document.querySelectorAll(".sample-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const sampleKey = btn.getAttribute("data-sample");
-      loadSample(sampleKey);
-    });
-  });
-
-  // Bulk Multi-Image Uploader
-  if (bulkUploaderCard && bulkFileInput) {
-    bulkUploaderCard.addEventListener("click", (e) => {
-      if (e.target !== btnResetMulti && !btnResetMulti.contains(e.target)) {
-        bulkFileInput.click();
-      }
-    });
-
-    bulkFileInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        loadBulkFiles(Array.from(e.target.files));
-      }
-    });
-
-    ["dragenter", "dragover"].forEach((evt) => {
-      bulkUploaderCard.addEventListener(evt, (e) => {
-        e.preventDefault();
-        bulkUploaderCard.classList.add("drag-over");
-      });
-    });
-
-    ["dragleave", "drop"].forEach((evt) => {
-      bulkUploaderCard.addEventListener(evt, (e) => {
-        e.preventDefault();
-        bulkUploaderCard.classList.remove("drag-over");
-      });
-    });
-
-    bulkUploaderCard.addEventListener("drop", (e) => {
-      if (e.dataTransfer.files.length > 0) {
-        loadBulkFiles(Array.from(e.dataTransfer.files));
-      }
-    });
-  }
-
-  function loadBulkFiles(files) {
-    const imgFiles = files.filter((f) => f.type.startsWith("image/"));
-    if (imgFiles.length === 0) {
-      alert("Please upload valid image files (PNG, JPG, WebP).");
-      return;
-    }
-
-    imgFiles.slice(0, activeLayers.length).forEach((file, idx) => {
-      if (activeLayers[idx]) {
-        activeLayers[idx].src = URL.createObjectURL(file);
-        activeLayers[idx].name = file.name.replace(/\.[^/.]+$/, "");
-        activeLayers[idx].tag = `Custom Upload (${file.name})`;
-      }
-    });
-
-    setMultiMode("mixer");
-    toggleSolo(1);
-    alert(`Successfully loaded ${Math.min(imgFiles.length, activeLayers.length)} images into the sample!`);
-  }
-
-  // Reset to default sample
-  if (btnResetMulti) {
-    btnResetMulti.addEventListener("click", (e) => {
-      e.stopPropagation();
-      loadSample(currentSampleKey);
-    });
-  }
 
   // ==========================================================================
-  // 3. Gallery Lightbox and Load Actions
+  // 9. Initial Boot: Attempt Manifest Fetch with Built-in Fallback
   // ==========================================================================
-  const lightbox = document.getElementById("lightbox-modal");
-  const lightboxImg = document.getElementById("lightbox-img");
-  const lightboxCaption = document.getElementById("lightbox-caption");
-  const lightboxClose = document.getElementById("lightbox-close-btn");
-
-  document.querySelectorAll(".btn-load-compare").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const beforeSrc = btn.getAttribute("data-before");
-      const afterSrc = btn.getAttribute("data-after");
-      const bTitle = btn.getAttribute("data-before-title") || "Before";
-      const aTitle = btn.getAttribute("data-after-title") || "After";
-
-      if (beforeSrc && imgBefore) imgBefore.src = beforeSrc;
-      if (afterSrc && imgAfter) imgAfter.src = afterSrc;
-      if (badgeBeforeTxt) badgeBeforeTxt.textContent = bTitle;
-      if (badgeAfterTxt) badgeAfterTxt.textContent = aTitle;
-      
-      document.getElementById("comparator").scrollIntoView({ behavior: "smooth" });
-    });
-  });
-
-  document.querySelectorAll(".btn-open-lightbox").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const src = btn.getAttribute("data-full");
-      const title = btn.getAttribute("data-title") || "Render Preview";
-      if (lightbox && lightboxImg) {
-        lightboxImg.src = src;
-        if (lightboxCaption) lightboxCaption.textContent = title;
-        lightbox.classList.add("active");
+  fetch("../images/oslviewer/manifest.json")
+    .then((res) => {
+      if (!res.ok) throw new Error("Manifest fetch returned non-200");
+      return res.json();
+    })
+    .then((data) => {
+      if (data && data.folders && data.folders.length > 0) {
+        foldersList = data.folders;
       }
+      switchFolder(0);
+    })
+    .catch(() => {
+      // Offline / file:// protocol fallback
+      foldersList = DEFAULT_MANIFEST.folders;
+      switchFolder(0);
     });
-  });
-
-  if (lightboxClose) {
-    lightboxClose.addEventListener("click", () => {
-      lightbox.classList.remove("active");
-    });
-  }
-
-  if (lightbox) {
-    lightbox.addEventListener("click", (e) => {
-      if (e.target === lightbox) {
-        lightbox.classList.remove("active");
-      }
-    });
-  }
-
-  // Initialize with Sample 1 (OptiX Ray-Tracing Passes)
-  loadSample("optix");
 });
