@@ -1520,8 +1520,19 @@ main {
 }
 
 /* Multi-Curtain / Multi-Wipe Slices */
+.multi-curtain-dividers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 35;
+  pointer-events: none;
+}
+
 .multi-stage-card.view-curtain .stack-layer {
+  display: block !important;
   opacity: 1 !important;
+  pointer-events: none;
 }
 
 .curtain-divider-line {
@@ -1531,25 +1542,105 @@ main {
   width: 3px;
   background: #ffffff;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 40;
   cursor: ew-resize;
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+  pointer-events: auto;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.9), 0 0 25px rgba(0, 240, 255, 0.5);
+  touch-action: none;
+  user-select: none;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.curtain-divider-tag {
+.curtain-divider-line:hover,
+.curtain-divider-line.dragging {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 1), 0 0 35px rgba(0, 240, 255, 0.8);
+}
+
+.curtain-divider-line::before {
+  content: "";
   position: absolute;
-  top: 1rem;
+  top: 0;
+  bottom: 0;
+  left: -8px;
+  width: 19px;
+  cursor: ew-resize;
+}
+
+.curtain-divider-knob {
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-code);
-  font-size: 0.72rem;
-  background: rgba(18, 20, 32, 0.95);
-  border: 1px solid var(--accent-cyan);
-  color: #fff;
-  padding: 0.2rem 0.5rem;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(12, 14, 24, 0.95);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.7), 0 4px 10px rgba(0, 0, 0, 0.8);
+  pointer-events: auto;
+  cursor: ew-resize;
+  transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.curtain-divider-line:hover .curtain-divider-knob,
+.curtain-divider-line.dragging .curtain-divider-knob {
+  transform: translate(-50%, -50%) scale(1.15);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Slice Label Badge Masked inside each layer */
+.slice-label-badge {
+  position: absolute;
+  top: 0.85rem;
+  z-index: 15;
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  background: rgba(10, 12, 22, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 240, 255, 0.4);
   border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
   white-space: nowrap;
   pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.15s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multi-stage-card.view-curtain .slice-label-badge {
+  display: inline-flex;
+}
+
+.slice-label-badge .badge-render-num {
+  font-family: var(--font-code);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.15);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.slice-label-badge .badge-title-txt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* In curtain view, hide the global top-left pill so it doesn't overlap slice labels */
+.multi-stage-card.view-curtain #multi-active-pill {
+  display: none;
 }
 
 /* Synchronized Matrix Grid View (2x3 or 3x2) */

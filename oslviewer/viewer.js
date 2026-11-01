@@ -12,18 +12,18 @@ document.addEventListener("DOMContentLoaded", () => {
     optix: {
       id: "optix",
       title: "Sample 1: OptiX Ray-Tracing Passes",
-      subtitle: "High-resolution 1920x1080 pipeline: Raw Shading → Depth Buffer → DOF Debug → Post-Processed",
+      subtitle: "High-resolution 1920x1080 pipeline: Depth Buffer → DOF Debug → Raw Shading → Post-Processed",
       layers: [
-        { id: 1, name: "Render07: OptiX Raw Ray-Traced Shading", tag: "Pass 1: Raw Render", src: "../images/oslviewer/Render07.png" },
-        { id: 2, name: "Render04: Z-Depth Buffer Pass", tag: "Pass 2: Depth Pass", src: "../images/oslviewer/Render04.png" },
-        { id: 3, name: "Render05: Depth of Field Debug", tag: "Pass 3: DOF Debug", src: "../images/oslviewer/Render05.png" },
-        { id: 4, name: "Render08: OptiX Post-Processed Render", tag: "Pass 4: Post Final", src: "../images/oslviewer/Render08.png" }
+        { id: 1, renderNum: "04", name: "Render04: Z-Depth Buffer Pass", tag: "Render04: Depth Pass", shortTitle: "Render04: Depth", src: "../images/oslviewer/Render04.png" },
+        { id: 2, renderNum: "05", name: "Render05: Depth of Field Debug", tag: "Render05: DOF Debug", shortTitle: "Render05: DOF", src: "../images/oslviewer/Render05.png" },
+        { id: 3, renderNum: "07", name: "Render07: OptiX Raw Ray-Traced Shading", tag: "Render07: Raw Shading", shortTitle: "Render07: Raw", src: "../images/oslviewer/Render07.png" },
+        { id: 4, renderNum: "08", name: "Render08: OptiX Post-Processed Render", tag: "Render08: Post Final", shortTitle: "Render08: Post", src: "../images/oslviewer/Render08.png" }
       ],
       comparatorPair: {
-        before: "../images/oslviewer/Render07.png",
+        before: "../images/oslviewer/Render04.png",
         after: "../images/oslviewer/Render08.png",
-        beforeTitle: "Render07: Raw Shading",
-        afterTitle: "Render08: Post Render"
+        beforeTitle: "Render04: Depth",
+        afterTitle: "Render08: Post"
       }
     },
     flat: {
@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Sample 2: Viewport Flat Shading",
       subtitle: "Geometry & viewport shading inspection: Angle A → Flat Base → Flat Post",
       layers: [
-        { id: 1, name: "Render01: Flat Shaded (Angle A)", tag: "Pass 1: Flat Angle A", src: "../images/oslviewer/Render01.png" },
-        { id: 2, name: "Render02: Flat Shaded Base (Angle B)", tag: "Pass 2: Flat Base B", src: "../images/oslviewer/Render02.png" },
-        { id: 3, name: "Render03: Flat Post-Processed (Angle B)", tag: "Pass 3: Flat Post B", src: "../images/oslviewer/Render03.png" }
+        { id: 1, renderNum: "01", name: "Render01: Flat Shaded (Angle A)", tag: "Render01: Flat A", shortTitle: "Render01: Flat A", src: "../images/oslviewer/Render01.png" },
+        { id: 2, renderNum: "02", name: "Render02: Flat Shaded Base (Angle B)", tag: "Render02: Flat Base", shortTitle: "Render02: Base", src: "../images/oslviewer/Render02.png" },
+        { id: 3, renderNum: "03", name: "Render03: Flat Post-Processed (Angle B)", tag: "Render03: Flat Post", shortTitle: "Render03: Post", src: "../images/oslviewer/Render03.png" }
       ],
       comparatorPair: {
         before: "../images/oslviewer/Render02.png",
@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Sample 3: OSL Shader Benchmark",
       subtitle: "Differential shading evaluation: Baseline Reference vs Custom OSL Shader",
       layers: [
-        { id: 1, name: "Render06: Baseline Ground Truth", tag: "Pass 1: Baseline Reference", src: "../images/oslviewer/Render06.png" },
-        { id: 2, name: "Render After: OSL Beauty Shading", tag: "Pass 2: OSL Beauty", src: "../images/oslviewer/Render_01_after.png" }
+        { id: 1, renderNum: "06", name: "Render06: Baseline Ground Truth", tag: "Render06: Baseline", shortTitle: "Render06: Baseline", src: "../images/oslviewer/Render06.png" },
+        { id: 2, renderNum: "After", name: "Render After: OSL Beauty Shading", tag: "OSL Beauty Pass", shortTitle: "OSL Beauty", src: "../images/oslviewer/Render_01_after.png" }
       ],
       comparatorPair: {
         before: "../images/oslviewer/Render06.png",
@@ -62,19 +62,19 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Sample 4: Complete Sequence (Render 01–08)",
       subtitle: "All 8 project renders arranged in numerical order",
       layers: [
-        { id: 1, name: "Render01: Flat Angle A", tag: "Pass 1", src: "../images/oslviewer/Render01.png" },
-        { id: 2, name: "Render02: Flat Base B", tag: "Pass 2", src: "../images/oslviewer/Render02.png" },
-        { id: 3, name: "Render03: Flat Post B", tag: "Pass 3", src: "../images/oslviewer/Render03.png" },
-        { id: 4, name: "Render04: Depth Buffer", tag: "Pass 4", src: "../images/oslviewer/Render04.png" },
-        { id: 5, name: "Render05: DOF Debug Pass", tag: "Pass 5", src: "../images/oslviewer/Render05.png" },
-        { id: 6, name: "Render06: Baseline Reference", tag: "Pass 6", src: "../images/oslviewer/Render06.png" },
-        { id: 7, name: "Render07: Raw Shading", tag: "Pass 7", src: "../images/oslviewer/Render07.png" },
-        { id: 8, name: "Render08: Post Final", tag: "Pass 8", src: "../images/oslviewer/Render08.png" }
+        { id: 1, renderNum: "01", name: "Render01: Flat Angle A", tag: "Render01: Flat A", shortTitle: "Render01", src: "../images/oslviewer/Render01.png" },
+        { id: 2, renderNum: "02", name: "Render02: Flat Base B", tag: "Render02: Base", shortTitle: "Render02", src: "../images/oslviewer/Render02.png" },
+        { id: 3, renderNum: "03", name: "Render03: Flat Post B", tag: "Render03: Post", shortTitle: "Render03", src: "../images/oslviewer/Render03.png" },
+        { id: 4, renderNum: "04", name: "Render04: Depth Buffer", tag: "Render04: Depth", shortTitle: "Render04", src: "../images/oslviewer/Render04.png" },
+        { id: 5, renderNum: "05", name: "Render05: DOF Debug Pass", tag: "Render05: DOF", shortTitle: "Render05", src: "../images/oslviewer/Render05.png" },
+        { id: 6, renderNum: "06", name: "Render06: Baseline Reference", tag: "Render06: Baseline", shortTitle: "Render06", src: "../images/oslviewer/Render06.png" },
+        { id: 7, renderNum: "07", name: "Render07: Raw Shading", tag: "Render07: Raw", shortTitle: "Render07", src: "../images/oslviewer/Render07.png" },
+        { id: 8, renderNum: "08", name: "Render08: Post Final", tag: "Render08: Post", shortTitle: "Render08", src: "../images/oslviewer/Render08.png" }
       ],
       comparatorPair: {
-        before: "../images/oslviewer/Render07.png",
+        before: "../images/oslviewer/Render04.png",
         after: "../images/oslviewer/Render08.png",
-        beforeTitle: "Render07: Raw",
+        beforeTitle: "Render04: Depth",
         afterTitle: "Render08: Post"
       }
     }
@@ -118,11 +118,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Rebuild DOM and UI
     buildMultiCanvasDOM();
     buildScrubberDOM();
-    renderMultiLayers();
-    toggleSolo(1);
 
     if (multiMode === "curtain") {
+      activeSoloIndex = null;
       setupMultiCurtain();
+    } else {
+      renderMultiLayers();
+      toggleSolo(1);
     }
   }
 
@@ -388,12 +390,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let multiMode = "mixer"; // 'mixer', 'curtain', 'matrix'
   let activeSoloIndex = 1;
   let cycleInterval = null;
+  let curtainPositions = [];
 
   // Build Canvas Layers dynamically for the active sample
   function buildMultiCanvasDOM() {
     if (!multiCanvas) return;
-    // Keep curtain dividers container intact
-    multiCanvas.innerHTML = '<div id="multi-curtain-dividers" class="multi-curtain-dividers" style="display: none;"></div>';
+    multiCanvas.innerHTML = "";
 
     activeLayers.forEach((layer) => {
       const layerEl = document.createElement("div");
@@ -401,9 +403,26 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.className = "stack-layer";
       layerEl.style.zIndex = layer.id;
       layerEl.style.opacity = layer.id === 1 ? "1" : "0";
-      layerEl.innerHTML = `<img src="${layer.src}" alt="${layer.name}" />`;
+
+      const numLabel = layer.renderNum ? `Render${layer.renderNum}` : `Pass ${layer.id}`;
+      const titleLabel = layer.shortTitle || layer.tag;
+
+      layerEl.innerHTML = `
+        <img src="${layer.src}" alt="${layer.name}" />
+        <div class="slice-label-badge">
+          <span class="badge-render-num">${numLabel}</span>
+          <span class="badge-title-txt">${titleLabel}</span>
+        </div>
+      `;
       multiCanvas.appendChild(layerEl);
     });
+
+    // Dividers container placed ON TOP of all layers in DOM order
+    const dividers = document.createElement("div");
+    dividers.id = "multi-curtain-dividers";
+    dividers.className = "multi-curtain-dividers";
+    dividers.style.display = multiMode === "curtain" ? "block" : "none";
+    multiCanvas.appendChild(dividers);
   }
 
   // Build Continuous Scrubber DOM for active sample length
@@ -431,6 +450,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply Layer State to DOM
   function renderMultiLayers() {
+    if (multiMode === "curtain") return;
     activeLayers.forEach((layer) => {
       const layerEl = document.getElementById(`stack-layer-${layer.id}`);
       if (!layerEl) return;
@@ -590,6 +610,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Toggle Solo for a Style
   function toggleSolo(layerId) {
+    if (multiMode === "curtain") {
+      setMultiMode("mixer");
+      const mixerBtn = document.querySelector('[data-multimode="mixer"]');
+      if (mixerBtn) {
+        document.querySelectorAll(".multi-view-btn").forEach((b) => b.classList.remove("active"));
+        mixerBtn.classList.add("active");
+      }
+    }
     if (activeSoloIndex === layerId && activeLayers.length > 1) {
       activeSoloIndex = null;
       activePillNum.textContent = "Mix";
@@ -622,23 +650,108 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const dividers = document.getElementById("multi-curtain-dividers");
     if (dividers) dividers.style.display = "none";
+
+    const equalizeBtn = document.getElementById("btn-equalize-curtain");
+    if (equalizeBtn) {
+      equalizeBtn.style.display = (mode === "curtain") ? "inline-flex" : "none";
+    }
     
     activeLayers.forEach((l) => {
       const layerEl = document.getElementById(`stack-layer-${l.id}`);
-      if (layerEl) layerEl.style.clipPath = "none";
+      if (layerEl) {
+        layerEl.style.clipPath = "none";
+        const badge = layerEl.querySelector(".slice-label-badge");
+        if (badge) {
+          badge.style.left = "";
+          badge.style.maxWidth = "";
+          badge.style.opacity = "";
+        }
+      }
     });
 
     if (mode === "curtain") {
+      activeSoloIndex = null;
       multiStageCard.classList.add("view-curtain");
       setupMultiCurtain();
     } else if (mode === "matrix") {
       multiStageCard.classList.add("view-matrix");
+      renderMatrixUI();
     } else {
       renderMultiLayers();
+      if (activeSoloIndex !== null) {
+        toggleSolo(activeSoloIndex);
+      }
     }
   }
 
-  // Setup Multi-Curtain Mode (Splitting screen into N vertical zones in exact order)
+  // Push & Accordion Cascade Logic for Curtain Dividers
+  function pushCurtainDividers(dragIdx, targetPct) {
+    const M = activeLayers.length - 1;
+    if (M < 1) return;
+
+    const minGap = 0.8; // Gap in % between adjacent dividers
+    const minBound = 0.5;
+    const maxBound = 99.5;
+
+    // Strict boundaries for divider dragIdx to ensure all M dividers fit
+    const lowerLimit = minBound + dragIdx * minGap;
+    const upperLimit = maxBound - (M - 1 - dragIdx) * minGap;
+    const clamped = Math.max(lowerLimit, Math.min(upperLimit, targetPct));
+
+    curtainPositions[dragIdx] = clamped;
+
+    // Push right: forward accordion cascade to end
+    for (let j = dragIdx + 1; j < M; j++) {
+      if (curtainPositions[j] < curtainPositions[j - 1] + minGap) {
+        curtainPositions[j] = curtainPositions[j - 1] + minGap;
+      }
+    }
+
+    // Push left: backward accordion cascade to start
+    for (let j = dragIdx - 1; j >= 0; j--) {
+      if (curtainPositions[j] > curtainPositions[j + 1] - minGap) {
+        curtainPositions[j] = curtainPositions[j + 1] - minGap;
+      }
+    }
+
+    updateCurtainSlices();
+  }
+
+  function updateCurtainSlices() {
+    const count = activeLayers.length;
+    if (count < 2) return;
+
+    activeLayers.forEach((layer, idx) => {
+      const layerEl = document.getElementById(`stack-layer-${layer.id}`);
+      if (!layerEl) return;
+
+      const left = (idx === 0) ? 0 : curtainPositions[idx - 1];
+      const right = (idx === count - 1) ? 100 : curtainPositions[idx];
+      const sliceWidth = Math.max(0, right - left);
+
+      layerEl.style.clipPath = `polygon(${left}% 0%, ${right}% 0%, ${right}% 100%, ${left}% 100%)`;
+      layerEl.style.opacity = "1";
+      layerEl.style.display = "block";
+      layerEl.style.mixBlendMode = "normal";
+
+      // Dynamically position and mask badge within slice bounds
+      const badge = layerEl.querySelector(".slice-label-badge");
+      if (badge) {
+        badge.style.left = `calc(${left}% + 10px)`;
+        badge.style.maxWidth = `calc(${sliceWidth}% - 16px)`;
+        badge.style.opacity = (sliceWidth < 3.5) ? "0" : "1";
+      }
+    });
+
+    const dividerEls = document.querySelectorAll(".curtain-divider-line");
+    dividerEls.forEach((divLine, k) => {
+      if (curtainPositions[k] !== undefined) {
+        divLine.style.left = `${curtainPositions[k]}%`;
+      }
+    });
+  }
+
+  // Setup Multi-Curtain Mode (Interactive Draggable Vertical Dividers)
   function setupMultiCurtain() {
     const dividers = document.getElementById("multi-curtain-dividers");
     if (!dividers) return;
@@ -646,28 +759,88 @@ document.addEventListener("DOMContentLoaded", () => {
     dividers.innerHTML = "";
 
     const count = activeLayers.length;
-    const sliceWidth = 100 / count;
+    if (count < 2) {
+      dividers.innerHTML = '<div class="curtain-divider-tag" style="top: 1rem; left: 50%; transform: translateX(-50%);">Curtain requires at least 2 layers</div>';
+      return;
+    }
 
-    activeLayers.forEach((layer, idx) => {
-      const layerEl = document.getElementById(`stack-layer-${layer.id}`);
-      if (!layerEl) return;
+    const M = count - 1;
 
-      const left = idx * sliceWidth;
-      const right = (idx + 1) * sliceWidth;
+    // Initialize evenly spaced divider positions
+    curtainPositions = [];
+    for (let k = 0; k < M; k++) {
+      curtainPositions.push(((k + 1) * 100) / count);
+    }
 
-      layerEl.style.clipPath = `polygon(${left}% 0, ${right}% 0, ${right}% 100%, ${left}% 100%)`;
-      layerEl.style.opacity = "1";
-      layerEl.style.display = "block";
-      layerEl.style.mixBlendMode = "normal";
+    // Build interactive draggable divider handles with vertically staggered knob positions
+    for (let k = 0; k < M; k++) {
+      const divLine = document.createElement("div");
+      divLine.className = "curtain-divider-line";
+      divLine.style.left = `${curtainPositions[k]}%`;
+      divLine.style.zIndex = (40 + k).toString();
 
-      if (idx > 0) {
-        const divLine = document.createElement("div");
-        divLine.className = "curtain-divider-line";
-        divLine.style.left = `${left}%`;
-        divLine.innerHTML = `<span class="curtain-divider-tag">[${idx}] | [${idx + 1}]</span>`;
-        dividers.appendChild(divLine);
-      }
-    });
+      // Distribute knobs vertically between 20% and 80% so they never stack on top of each other
+      const topPct = (M <= 1) ? 50 : Math.round(20 + (k / (M - 1)) * 60);
+
+      const prevLayer = activeLayers[k];
+      const nextLayer = activeLayers[k + 1];
+      const dividerTitle = `Divider ${k + 1}: ${prevLayer.tag} | ${nextLayer.tag}`;
+
+      divLine.innerHTML = `
+        <div class="curtain-divider-knob" style="top: ${topPct}%;" aria-label="${dividerTitle}" title="${dividerTitle}">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M8.5 7l-5 5 5 5V7zm7 10l5-5-5-5v10z"/>
+          </svg>
+        </div>
+      `;
+
+      let isDraggingCurtain = false;
+
+      divLine.addEventListener("pointerdown", (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        isDraggingCurtain = true;
+        divLine.style.zIndex = "65";
+        divLine.classList.add("dragging");
+        divLine.setPointerCapture(e.pointerId);
+      });
+
+      divLine.addEventListener("pointermove", (e) => {
+        if (!isDraggingCurtain) return;
+        const rect = multiCanvas.getBoundingClientRect();
+        if (!rect.width) return;
+        const pct = ((e.clientX - rect.left) / rect.width) * 100;
+        pushCurtainDividers(k, pct);
+      });
+
+      const stopDrag = (e) => {
+        if (isDraggingCurtain) {
+          isDraggingCurtain = false;
+          divLine.style.zIndex = (40 + k).toString();
+          divLine.classList.remove("dragging");
+          try {
+            divLine.releasePointerCapture(e.pointerId);
+          } catch (err) {}
+        }
+      };
+
+      divLine.addEventListener("pointerup", stopDrag);
+      divLine.addEventListener("pointercancel", stopDrag);
+
+      // Double-click resets back to equal spacing
+      divLine.addEventListener("dblclick", () => {
+        setupMultiCurtain();
+      });
+
+      dividers.appendChild(divLine);
+    }
+
+    updateCurtainSlices();
+
+    if (activePillNum && activePillTitle) {
+      activePillNum.textContent = "||";
+      activePillTitle.textContent = `Multi-Curtain Wipe (${count} Passes)`;
+    }
   }
 
   // Continuous Scrubber
@@ -680,6 +853,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (scrubSlider) {
     scrubSlider.addEventListener("input", (e) => {
+      if (multiMode === "curtain") {
+        setMultiMode("mixer");
+        const mixerBtn = document.querySelector('[data-multimode="mixer"]');
+        if (mixerBtn) {
+          document.querySelectorAll(".multi-view-btn").forEach((b) => b.classList.remove("active"));
+          mixerBtn.classList.add("active");
+        }
+      }
       const val = parseFloat(e.target.value);
       applyScrubPosition(val);
     });
@@ -763,6 +944,14 @@ document.addEventListener("DOMContentLoaded", () => {
       flashEnd();
     }
   });
+
+  // Equalize Curtains Button
+  const equalizeBtn = document.getElementById("btn-equalize-curtain");
+  if (equalizeBtn) {
+    equalizeBtn.addEventListener("click", () => {
+      setupMultiCurtain();
+    });
+  }
 
   // Sample Selector Button Clicks
   document.querySelectorAll(".sample-btn").forEach((btn) => {

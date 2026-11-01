@@ -135,6 +135,9 @@
         </div>
 
         <div class="playback-controls">
+          <button type="button" id="btn-equalize-curtain" class="cycle-btn" style="display: none;" title="Reset curtain slices to equal width">
+            <i class="fa-solid fa-table-columns"></i> Equalize Slices
+          </button>
           <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through all passes in sequence">
             <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
           </button>
@@ -146,7 +149,7 @@
         <!-- Live Active Style Badge -->
         <div id="multi-active-pill" class="multi-active-pill">
           <span class="pill-num" id="active-layer-num">1</span>
-          <span id="active-layer-title">Render07: OptiX Raw Ray-Traced Shading</span>
+          <span id="active-layer-title">Render04: Z-Depth Buffer Pass</span>
         </div>
 
         <!-- Canvas (Populated dynamically by viewer.js with the active sample's layers in order) -->
@@ -244,38 +247,38 @@
         <div class="pair-preset-group">
           <span style="font-size: 0.8rem; color: var(--text-dim);">Pairs:</span>
           <button type="button" class="pair-preset-btn active"
-            data-before="../images/oslviewer/Render07.png"
-            data-after="../images/oslviewer/Render08.png"
-            data-before-title="Render07: Raw Shading"
-            data-after-title="Render08: Post Render">
-            Raw vs Post (S1)
-          </button>
-          <button type="button" class="pair-preset-btn"
             data-before="../images/oslviewer/Render04.png"
             data-after="../images/oslviewer/Render08.png"
-            data-before-title="Render04: Depth Buffer"
-            data-after-title="Render08: Post Render">
+            data-before-title="Depth Buffer"
+            data-after-title="Post Render">
             Depth vs Post (S1)
           </button>
           <button type="button" class="pair-preset-btn"
             data-before="../images/oslviewer/Render05.png"
             data-after="../images/oslviewer/Render08.png"
-            data-before-title="Render05: DOF Debug"
-            data-after-title="Render08: Post Render">
+            data-before-title="DOF Debug"
+            data-after-title="Post Render">
             DOF Debug vs Post (S1)
+          </button>
+          <button type="button" class="pair-preset-btn"
+            data-before="../images/oslviewer/Render07.png"
+            data-after="../images/oslviewer/Render08.png"
+            data-before-title="Raw Shading"
+            data-after-title="Post Render">
+            Raw vs Post (S1)
           </button>
           <button type="button" class="pair-preset-btn"
             data-before="../images/oslviewer/Render02.png"
             data-after="../images/oslviewer/Render03.png"
-            data-before-title="Render02: Flat Base"
-            data-after-title="Render03: Flat Post">
+            data-before-title="Flat Base"
+            data-after-title="Flat Post">
             Flat Base vs Post (S2)
           </button>
           <button type="button" class="pair-preset-btn"
             data-before="../images/oslviewer/Render06.png"
             data-after="../images/oslviewer/Render_01_after.png"
-            data-before-title="Render06: Baseline"
-            data-after-title="OSL Beauty Render">
+            data-before-title="Baseline"
+            data-after-title="Render">
             OSL Before vs After (S3)
           </button>
         </div>
@@ -291,10 +294,10 @@
       <div id="comparator-stage" class="comparator-stage">
         <!-- Overlay Badges -->
         <div class="badge-pill badge-before">
-          <i class="fa-solid fa-camera"></i> <span id="badge-before-txt">Render07: Raw Shading</span>
+          <i class="fa-solid fa-camera"></i> <span id="badge-before-txt">Depth Buffer</span>
         </div>
         <div class="badge-pill badge-after">
-          <i class="fa-solid fa-sparkles"></i> <span id="badge-after-txt">Render08: Post Render</span>
+          <i class="fa-solid fa-sparkles"></i> <span id="badge-after-txt">Post Render</span>
         </div>
 
         <!-- Diff Map Active Banner -->
@@ -307,12 +310,12 @@
         <div id="comparison-box" class="comparison-box">
           <!-- Bottom Layer: After Image -->
           <div class="layer-after">
-            <img id="img-after" src="../images/oslviewer/Render08.png" alt="Render08: Post Render" />
+            <img id="img-after" src="../images/oslviewer/Render08.png" alt="Post Render" />
           </div>
 
           <!-- Top Overlay Layer: Before Image -->
           <div class="layer-before">
-            <img id="img-before" src="../images/oslviewer/Render07.png" alt="Render07: Raw Shading" />
+            <img id="img-before" src="../images/oslviewer/Render04.png" alt="Depth Buffer" />
           </div>
 
           <!-- Vertical Split Line -->
@@ -472,7 +475,7 @@
       <div class="gallery-sample-header">
         <div>
           <h3><i class="fa-solid fa-layer-group" style="color: var(--accent-cyan);"></i> Sample Set 1: OptiX Ray-Tracing Pipeline</h3>
-          <p>Chronological progression: Raw Shading &rarr; Depth Buffer &rarr; DOF Debug &rarr; Post-Processed Final (1920&times;1080)</p>
+          <p>Numerical progression: Depth Buffer &rarr; DOF Debug &rarr; Raw Shading &rarr; Post-Processed Final (1920&times;1080)</p>
         </div>
         <button type="button" class="sample-btn" data-sample="optix">
           <i class="fa-solid fa-sliders"></i> Load Sample 1 in Stack
@@ -480,56 +483,26 @@
       </div>
 
       <div class="gallery-grid">
-        <!-- Pass 1: Render07 Raw -->
-        <div class="gallery-card">
-          <div class="gallery-card-thumb">
-            <img src="../images/oslviewer/Render07.png" alt="Render07 Raw Shading">
-            <span class="thumb-badge">Step 1: Raw Shading</span>
-            <div class="thumb-overlay-action">
-              <button
-                type="button"
-                class="overlay-btn overlay-btn-primary btn-load-compare"
-                data-before="../images/oslviewer/Render07.png"
-                data-after="../images/oslviewer/Render08.png"
-                data-before-title="Render07: Raw Shading"
-                data-after-title="Render08: Post Render">
-                <i class="fa-solid fa-sliders"></i> Compare
-              </button>
-              <button
-                type="button"
-                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
-                data-full="../images/oslviewer/Render07.png"
-                data-title="Step 1: Render07 &mdash; OptiX Raw Ray-Traced Shading">
-                <i class="fa-solid fa-magnifying-glass-plus"></i> View
-              </button>
-            </div>
-          </div>
-          <div class="gallery-card-info">
-            <h4>Render07 &mdash; Raw Ray-Traced Shading</h4>
-            <p>Direct un-tone-mapped output from the OptiX ray-tracing pipeline core.</p>
-          </div>
-        </div>
-
-        <!-- Pass 2: Render04 Depth -->
+        <!-- Pass 1: Render04 Depth -->
         <div class="gallery-card">
           <div class="gallery-card-thumb">
             <img src="../images/oslviewer/Render04.png" alt="Render04 Z-Depth">
-            <span class="thumb-badge">Step 2: Z-Depth AOV</span>
+            <span class="thumb-badge">Step 1: Z-Depth AOV</span>
             <div class="thumb-overlay-action">
               <button
                 type="button"
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render04.png"
                 data-after="../images/oslviewer/Render08.png"
-                data-before-title="Render04: Depth Buffer"
-                data-after-title="Render08: Post Render">
+                data-before-title="Depth Buffer"
+                data-after-title="Post Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
                 type="button"
                 class="overlay-btn overlay-btn-secondary btn-open-lightbox"
                 data-full="../images/oslviewer/Render04.png"
-                data-title="Step 2: Render04 &mdash; OptiX Z-Depth Buffer Pass">
+                data-title="Step 1: Render04 &mdash; OptiX Z-Depth Buffer Pass">
                 <i class="fa-solid fa-magnifying-glass-plus"></i> View
               </button>
             </div>
@@ -540,26 +513,26 @@
           </div>
         </div>
 
-        <!-- Pass 3: Render05 DOF Debug -->
+        <!-- Pass 2: Render05 DOF Debug -->
         <div class="gallery-card">
           <div class="gallery-card-thumb">
             <img src="../images/oslviewer/Render05.png" alt="Render05 DOF Debug">
-            <span class="thumb-badge">Step 3: DOF Debug</span>
+            <span class="thumb-badge">Step 2: DOF Debug</span>
             <div class="thumb-overlay-action">
               <button
                 type="button"
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render05.png"
                 data-after="../images/oslviewer/Render08.png"
-                data-before-title="Render05: DOF Debug"
-                data-after-title="Render08: Post Render">
+                data-before-title="DOF Debug"
+                data-after-title="Post Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
                 type="button"
                 class="overlay-btn overlay-btn-secondary btn-open-lightbox"
                 data-full="../images/oslviewer/Render05.png"
-                data-title="Step 3: Render05 &mdash; Depth of Field Debug Pass">
+                data-title="Step 2: Render05 &mdash; Depth of Field Debug Pass">
                 <i class="fa-solid fa-magnifying-glass-plus"></i> View
               </button>
             </div>
@@ -570,19 +543,49 @@
           </div>
         </div>
 
-        <!-- Pass 4: Render08 Post Final -->
+        <!-- Pass 3: Render07 Raw -->
         <div class="gallery-card">
           <div class="gallery-card-thumb">
-            <img src="../images/oslviewer/Render08.png" alt="Render08 Post-Processed">
-            <span class="thumb-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">Step 4: Post Final</span>
+            <img src="../images/oslviewer/Render07.png" alt="Render07 Raw Shading">
+            <span class="thumb-badge">Step 3: Raw Shading</span>
             <div class="thumb-overlay-action">
               <button
                 type="button"
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render07.png"
                 data-after="../images/oslviewer/Render08.png"
-                data-before-title="Render07: Raw Shading"
-                data-after-title="Render08: Post Render">
+                data-before-title="Raw Shading"
+                data-after-title="Post Render">
+                <i class="fa-solid fa-sliders"></i> Compare
+              </button>
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-secondary btn-open-lightbox"
+                data-full="../images/oslviewer/Render07.png"
+                data-title="Step 3: Render07 &mdash; OptiX Raw Ray-Traced Shading">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> View
+              </button>
+            </div>
+          </div>
+          <div class="gallery-card-info">
+            <h4>Render07 &mdash; Raw Ray-Traced Shading</h4>
+            <p>Direct un-tone-mapped output from the OptiX ray-tracing pipeline core.</p>
+          </div>
+        </div>
+
+        <!-- Pass 4: Render08 Post Final -->
+        <div class="gallery-card">
+          <div class="gallery-card-thumb">
+            <img src="../images/oslviewer/Render08.png" alt="Post-Processed">
+            <span class="thumb-badge" style="color: var(--accent-cyan); border-color: var(--accent-cyan);">Step 4: Post Final</span>
+            <div class="thumb-overlay-action">
+              <button
+                type="button"
+                class="overlay-btn overlay-btn-primary btn-load-compare"
+                data-before="../images/oslviewer/Render04.png"
+                data-after="../images/oslviewer/Render08.png"
+                data-before-title="Depth Buffer"
+                data-after-title="Post Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
@@ -624,8 +627,8 @@
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render01.png"
                 data-after="../images/oslviewer/Render03.png"
-                data-before-title="Render01: Flat A"
-                data-after-title="Render03: Flat Post">
+                data-before-title="Flat A"
+                data-after-title="Flat Post">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
@@ -654,8 +657,8 @@
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render02.png"
                 data-after="../images/oslviewer/Render03.png"
-                data-before-title="Render02: Flat Base"
-                data-after-title="Render03: Flat Post">
+                data-before-title="Flat Base"
+                data-after-title="Flat Post">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
@@ -684,8 +687,8 @@
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render02.png"
                 data-after="../images/oslviewer/Render03.png"
-                data-before-title="Render02: Flat Base"
-                data-after-title="Render03: Flat Post">
+                data-before-title="Flat Base"
+                data-after-title="Flat Post">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
@@ -727,8 +730,8 @@
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render06.png"
                 data-after="../images/oslviewer/Render_01_after.png"
-                data-before-title="Render06: Baseline"
-                data-after-title="OSL Beauty Render">
+                data-before-title="Baseline"
+                data-after-title="Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
@@ -757,8 +760,8 @@
                 class="overlay-btn overlay-btn-primary btn-load-compare"
                 data-before="../images/oslviewer/Render06.png"
                 data-after="../images/oslviewer/Render_01_after.png"
-                data-before-title="Render06: Baseline"
-                data-after-title="OSL Beauty Render">
+                data-before-title="Baseline"
+                data-after-title="Render">
                 <i class="fa-solid fa-sliders"></i> Compare
               </button>
               <button
