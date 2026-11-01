@@ -1565,11 +1565,11 @@ main {
   left: -8px;
   width: 19px;
   cursor: ew-resize;
+  pointer-events: auto;
 }
 
 .curtain-divider-knob {
   position: absolute;
-  left: 50%;
   transform: translate(-50%, -50%);
   width: 30px;
   height: 30px;
@@ -1583,7 +1583,18 @@ main {
   box-shadow: 0 0 12px rgba(0, 240, 255, 0.7), 0 4px 10px rgba(0, 0, 0, 0.8);
   pointer-events: auto;
   cursor: ew-resize;
+  z-index: 60;
+  touch-action: none;
+  user-select: none;
   transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.curtain-divider-knob:hover,
+.curtain-divider-knob.dragging {
+  transform: translate(-50%, -50%) scale(1.18);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 0 22px rgba(0, 240, 255, 1), 0 4px 12px rgba(0, 0, 0, 0.9);
 }
 
 .curtain-divider-line:hover .curtain-divider-knob,

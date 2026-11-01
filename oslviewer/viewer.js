@@ -261,28 +261,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const M = activeLayers.length - 1;
     if (M < 1) return;
 
-    const minGap = 0.8; // Gap in % between adjacent dividers
-    const minBound = 0.5;
-    const maxBound = 99.5;
-
-    // Strict boundaries for divider dragIdx to ensure all M dividers fit
-    const lowerLimit = minBound + dragIdx * minGap;
-    const upperLimit = maxBound - (M - 1 - dragIdx) * minGap;
-    const clamped = Math.max(lowerLimit, Math.min(upperLimit, targetPct));
-
+    // Zero gap: allows all divider lines and handles to collapse onto ONE single vertical line at either end
+    const clamped = Math.max(0, Math.min(100, targetPct));
     curtainPositions[dragIdx] = clamped;
 
-    // Push right: forward accordion cascade
+    // Push right: forward cascade
     for (let j = dragIdx + 1; j < M; j++) {
-      if (curtainPositions[j] < curtainPositions[j - 1] + minGap) {
-        curtainPositions[j] = curtainPositions[j - 1] + minGap;
+      if (curtainPositions[j] < curtainPositions[j - 1]) {
+        curtainPositions[j] = curtainPositions[j - 1];
       }
     }
 
-    // Push left: backward accordion cascade
+    // Push left: backward cascade
     for (let j = dragIdx - 1; j >= 0; j--) {
-      if (curtainPositions[j] > curtainPositions[j + 1] - minGap) {
-        curtainPositions[j] = curtainPositions[j + 1] - minGap;
+      if (curtainPositions[j] > curtainPositions[j + 1]) {
+        curtainPositions[j] = curtainPositions[j + 1];
       }
     }
 
@@ -294,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (count === 0) return;
 
     if (count === 1) {
-      // Single pass selected: display full layer
       const singleLayer = activeLayers[0];
       const layerEl = document.getElementById(`stack-layer-${singleLayer.id}`);
       if (layerEl) {
@@ -333,12 +325,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    const dividerEls = document.querySelectorAll(".curtain-divider-line");
-    dividerEls.forEach((divLine, k) => {
+    const M = count - 1;
+    for (let k = 0; k < M; k++) {
       if (curtainPositions[k] !== undefined) {
-        divLine.style.left = `${curtainPositions[k]}%`;
+        const pos = curtainPositions[k];
+        const line = document.getElementById(`curtain-line-${k}`);
+        const knob = document.getElementById(`curtain-knob-${k}`);
+        if (line) line.style.left = `${pos}%`;
+        if (knob) knob.style.left = `${pos}%`;
       }
-    });
+    }
   }
 
   function setupMultiCurtain() {
@@ -360,71 +356,93 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const M = count - 1;
 
-    // Initialize evenly spaced divider positions
-    curtainPositions = [];
-    for (let k = 0; k < M; k++) {
-      curtainPositions.push(((k + 1) * 100) / count);
+    // Initialize evenly spaced divider positions if not already matching count
+    if (!curtainPositions || curtainPositions.length !== M) {
+      curtainPositions = [];
+      for (let k = 0; k < M; k++) {
+        curtainPositions.push(((k + 1) * 100) / count);
+      }
     }
 
-    // Build interactive draggable divider handles with vertically staggered knobs
+    // Build interactive draggable divider lines and decoupled knobs (knobs above lines)
     for (let k = 0; k < M; k++) {
-      const divLine = document.createElement("div");
-      divLine.className = "curtain-divider-line";
-      divLine.style.left = `${curtainPositions[k]}%`;
-      divLine.style.zIndex = (40 + k).toString();
-
-      // Distribute knobs vertically between 20% and 80% so they never stack
-      const topPct = (M <= 1) ? 50 : Math.round(20 + (k / (M - 1)) * 60);
-
       const prevLayer = activeLayers[k];
       const nextLayer = activeLayers[k + 1];
       const dividerTitle = `Divider ${k + 1}: ${prevLayer.name} | ${nextLayer.name}`;
+      const topPct = (M <= 1) ? 50 : Math.round(20 + (k / (M - 1)) * 60);
 
-      divLine.innerHTML = `
-        <div class="curtain-divider-knob" style="top: ${topPct}%;" aria-label="${dividerTitle}" title="${dividerTitle}">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M8.5 7l-5 5 5 5V7zm7 10l5-5-5-5v10z"/>
-          </svg>
-        </div>
+      // 1. Divider Line
+      const divLine = document.createElement("div");
+      divLine.className = "curtain-divider-line";
+      divLine.id = `curtain-line-${k}`;
+      divLine.style.left = `${curtainPositions[k]}%`;
+      divLine.style.zIndex = (40 + k).toString();
+      dividers.appendChild(divLine);
+
+      // 2. Divider Knob Handle (sitting above all lines in z-index)
+      const knob = document.createElement("div");
+      knob.className = "curtain-divider-knob";
+      knob.id = `curtain-knob-${k}`;
+      knob.setAttribute("data-k", k.toString());
+      knob.style.left = `${curtainPositions[k]}%`;
+      knob.style.top = `${topPct}%`;
+      knob.style.zIndex = (60 + k).toString();
+      knob.setAttribute("title", dividerTitle);
+      knob.setAttribute("aria-label", dividerTitle);
+      knob.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M8.5 7l-5 5 5 5V7zm7 10l5-5-5-5v10z"/>
+        </svg>
       `;
 
-      let isDraggingCurtain = false;
+      let isDragging = false;
 
-      divLine.addEventListener("pointerdown", (e) => {
+      function startDrag(e) {
         e.stopPropagation();
         e.preventDefault();
-        isDraggingCurtain = true;
-        divLine.style.zIndex = "65";
+        isDragging = true;
         divLine.classList.add("dragging");
-        divLine.setPointerCapture(e.pointerId);
-      });
+        knob.classList.add("dragging");
+        knob.style.zIndex = "85";
+        divLine.style.zIndex = "84";
+        knob.setPointerCapture(e.pointerId);
+      }
 
-      divLine.addEventListener("pointermove", (e) => {
-        if (!isDraggingCurtain) return;
+      function onPointerMove(e) {
+        if (!isDragging) return;
         const rect = multiCanvas.getBoundingClientRect();
         if (!rect.width) return;
         const pct = ((e.clientX - rect.left) / rect.width) * 100;
         pushCurtainDividers(k, pct);
-      });
+      }
 
-      const stopDrag = (e) => {
-        if (isDraggingCurtain) {
-          isDraggingCurtain = false;
-          divLine.style.zIndex = (40 + k).toString();
+      function stopDrag(e) {
+        if (isDragging) {
+          isDragging = false;
           divLine.classList.remove("dragging");
+          knob.classList.remove("dragging");
+          knob.style.zIndex = (60 + k).toString();
+          divLine.style.zIndex = (40 + k).toString();
           try {
-            divLine.releasePointerCapture(e.pointerId);
+            knob.releasePointerCapture(e.pointerId);
           } catch (err) {}
         }
-      };
+      }
 
+      knob.addEventListener("pointerdown", startDrag);
+      knob.addEventListener("pointermove", onPointerMove);
+      knob.addEventListener("pointerup", stopDrag);
+      knob.addEventListener("pointercancel", stopDrag);
+
+      divLine.addEventListener("pointerdown", startDrag);
+      divLine.addEventListener("pointermove", onPointerMove);
       divLine.addEventListener("pointerup", stopDrag);
       divLine.addEventListener("pointercancel", stopDrag);
 
-      // Double-click resets back to equal spacing
+      knob.addEventListener("dblclick", () => setupMultiCurtain());
       divLine.addEventListener("dblclick", () => setupMultiCurtain());
 
-      dividers.appendChild(divLine);
+      dividers.appendChild(knob);
     }
 
     updateCurtainSlices();
