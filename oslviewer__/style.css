@@ -1499,6 +1499,64 @@ main {
   background: #05060b;
 }
 
+/* Stage flanked by pass-name gutters aligned with the curtain knobs */
+.curtain-stage-wrap {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 120px;
+  gap: 0.75rem;
+}
+
+/* Wide screens: grow into the page margins so the image keeps its full size */
+@media (min-width: 1660px) {
+  .curtain-stage-wrap {
+    grid-template-columns: 140px minmax(0, 1fr) 140px;
+    margin: 0 -152px;
+  }
+}
+
+@media (max-width: 700px) {
+  .curtain-stage-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .curtain-labels {
+    display: none;
+  }
+}
+
+.curtain-labels {
+  position: relative;
+}
+
+.curtain-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-code);
+  font-size: 0.74rem;
+  line-height: 1.2;
+  /* color and opacity are set by viewer.js from how much of the pass is showing */
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.curtain-labels-left .curtain-label {
+  justify-content: flex-end;
+}
+
+.curtain-label-num {
+  font-weight: 600;
+}
+
+.curtain-label-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Individual Stack Layers */
 .stack-layer {
   position: absolute;

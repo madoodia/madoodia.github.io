@@ -105,6 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const activePillTitle = document.getElementById("active-layer-title");
   const autoCycleBtn = document.getElementById("btn-auto-cycle");
   const equalizeBtn = document.getElementById("btn-equalize-curtain");
+  const curtainStageWrap = document.getElementById("curtain-stage-wrap");
+  const curtainLabelsLeft = document.getElementById("curtain-labels-left");
+  const curtainLabelsRight = document.getElementById("curtain-labels-right");
 
   // DOM Elements - Folder Slides Navigation
   const folderPillsWrap = document.getElementById("folder-pills-wrap");
@@ -495,24 +498,27 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Description (top-left) and OSL Studio logo (bottom-left) laid over one image
-  function createPassOverlay(layer) {
+  // OSL Studio logo (bottom-left) and, when asked for, the description (top-left) over one image
+  function createPassOverlay(layer, withCaption) {
     const overlay = document.createElement("div");
     overlay.className = "pass-overlay";
     overlay.dataset.src = layer.src;
 
-    const caption = document.createElement("div");
-    caption.className = "pass-caption";
-    caption.dataset.layer = layer.id;
-    caption.dir = "auto";
-    caption.textContent = layer.description;
-    caption.hidden = !layer.description;
+    if (withCaption) {
+      const caption = document.createElement("div");
+      caption.className = "pass-caption";
+      caption.dataset.layer = layer.id;
+      caption.dir = "auto";
+      caption.textContent = layer.description;
+      caption.hidden = !layer.description;
+      overlay.appendChild(caption);
+    }
 
     const logo = document.createElement("img");
     logo.className = "pass-logo";
     logo.alt = "OSL Studio";
 
-    overlay.append(caption, logo);
+    overlay.appendChild(logo);
     updateLogoTone(overlay, 0);
     return overlay;
   }
@@ -613,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.style.zIndex = (idx + 1).toString();
       layerEl.style.opacity = "1";
       layerEl.innerHTML = `<img src="${layer.src}" alt="${layer.name}" />`;
-      layerEl.appendChild(createPassOverlay(layer));
+      layerEl.appendChild(createPassOverlay(layer, false));
       multiCanvas.appendChild(layerEl);
     });
 
@@ -653,6 +659,41 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCurtainSlices();
   }
 
+  // Pass names beside the stage: one per pass, on the side its slice sits, level with its knob
+  let curtainLabels = [];   // One label per active layer, same order
+  let curtainKnobTops = []; // Vertical position (%) of each divider knob
+  const LABEL_GRAY = [108, 109, 130]; // --text-dim
+  const LABEL_CYAN = [0, 240, 255];   // --accent-cyan
+
+  function clearCurtainLabels() {
+    curtainLabels = [];
+    [curtainLabelsLeft, curtainLabelsRight].forEach((c) => {
+      if (c) c.innerHTML = "";
+    });
+  }
+
+  function createCurtainLabel(layer) {
+    const label = document.createElement("div");
+    label.className = "curtain-label";
+    label.title = layer.filename;
+
+    const num = document.createElement("span");
+    num.className = "curtain-label-num";
+    num.textContent = layer.num;
+    const name = document.createElement("span");
+    name.className = "curtain-label-name";
+    name.textContent = layer.name;
+
+    label.append(num, name);
+    return label;
+  }
+
+  if (curtainStageWrap && multiCanvas && window.ResizeObserver) {
+    new ResizeObserver(() => {
+      curtainStageWrap.style.setProperty("--canvas-h", `${multiCanvas.offsetHeight}px`);
+    }).observe(multiCanvas);
+  }
+
   function updateCurtainSlices() {
     const count = activeLayers.length;
     if (count === 0) return;
@@ -689,6 +730,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
+    // Each name sits on the side its slice is on, level with the knob on its outer edge.
+    // Its color runs from gray (squeezed shut: loaded, but not showing) to cyan
+    // (an equal share of the width or more).
+    const equalShare = 100 / count;
+    curtainLabels.forEach((label, idx) => {
+      const left = (idx === 0) ? 0 : curtainPositions[idx - 1];
+      const right = (idx === count - 1) ? 100 : curtainPositions[idx];
+      const onLeft = idx === 0 || (idx !== count - 1 && (left + right) / 2 < 50);
+
+      const side = onLeft ? curtainLabelsLeft : curtainLabelsRight;
+      if (side && label.parentElement !== side) side.appendChild(label);
+      // --canvas-h is the image height, so the label lines up with its knob
+      const knobTop = curtainKnobTops[onLeft ? idx : idx - 1];
+      label.style.top = `calc(var(--canvas-h, 0px) * ${knobTop / 100})`;
+
+      const t = Math.min(1, (right - left) / equalShare);
+      const rgb = LABEL_GRAY.map((g, i) => Math.round(g + (LABEL_CYAN[i] - g) * t));
+      label.style.color = `rgb(${rgb.join(", ")})`;
+      label.style.opacity = (0.5 + 0.5 * t).toFixed(3);
+    });
+
     const M = count - 1;
     for (let k = 0; k < M; k++) {
       if (curtainPositions[k] !== undefined) {
@@ -706,6 +768,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dividers) return;
     dividers.style.display = "block";
     dividers.innerHTML = "";
+    clearCurtainLabels();
 
     const count = activeLayers.length;
     if (count < 2) {
@@ -728,12 +791,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    curtainKnobTops = [];
+    curtainLabels = activeLayers.map((layer) => createCurtainLabel(layer));
+
     // Build interactive draggable divider lines and decoupled knobs (knobs above lines)
     for (let k = 0; k < M; k++) {
       const prevLayer = activeLayers[k];
       const nextLayer = activeLayers[k + 1];
       const dividerTitle = `Divider ${k + 1}: ${prevLayer.name} | ${nextLayer.name}`;
       const topPct = (M <= 1) ? 50 : Math.round(20 + (k / (M - 1)) * 60);
+      curtainKnobTops.push(topPct);
 
       // 1. Divider Line
       const divLine = document.createElement("div");
@@ -841,6 +908,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dividers = document.getElementById("multi-curtain-dividers");
     if (dividers) dividers.style.display = "none";
+    clearCurtainLabels();
 
     if (equalizeBtn) {
       equalizeBtn.style.display = (mode === "curtain") ? "inline-flex" : "none";
@@ -1031,7 +1099,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
         </div>
       `;
-      cell.querySelector(".matrix-thumb-wrap").appendChild(createPassOverlay(layer));
+      cell.querySelector(".matrix-thumb-wrap").appendChild(createPassOverlay(layer, true));
 
       cell.querySelector(".matrix-solo-btn").addEventListener("click", () => {
         setMultiMode("mixer");

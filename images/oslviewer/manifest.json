@@ -2,6 +2,22 @@
   "project": "OSL Studio",
   "folders": [
     {
+      "id": "Cinematic_Post",
+      "title": "Cinematic_Post",
+      "files": [
+        "01.flat.Wireframe.png",
+        "02.3D.Material.png",
+        "03.Render.depth.png",
+        "04.Denoised.Render.png",
+        "05.Render.SSAO.png",
+        "06.Render.Grains.png",
+        "07.Lens.Distortion.png",
+        "08.Lens.Flare.png",
+        "09.post.Grain.png",
+        "10.post.Final.png"
+      ]
+    },
+    {
       "id": "Cinematic_Shots",
       "title": "Cinematic_Shots",
       "files": [
