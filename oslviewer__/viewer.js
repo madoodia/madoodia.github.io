@@ -440,14 +440,81 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================================================
   // 3b. Pass Descriptions (Editor, Show/Hide Toggle, Manifest Export)
   // ==========================================================================
-  function createDescriptionEl(tagName, className, layer) {
-    const el = document.createElement(tagName);
-    el.className = className;
-    el.id = `${className}-${layer.id}`;
-    el.dir = "auto";
-    el.textContent = layer.description;
-    el.hidden = !layer.description;
-    return el;
+  const LOGO_ON_DARK = "../images/OSL_Studio_White.png";
+  const LOGO_ON_LIGHT = "../images/OSL_Studio_Black.png";
+  const LUMA_BUCKETS = 20;
+  const bottomLumaCache = {};
+
+  // Average brightness of the image's bottom strip, in LUMA_BUCKETS columns left to right
+  function measureBottomLuma(src) {
+    if (!bottomLumaCache[src]) {
+      bottomLumaCache[src] = new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const rows = 8, perBucket = 4;
+            const canvas = document.createElement("canvas");
+            canvas.width = LUMA_BUCKETS * perBucket;
+            canvas.height = rows;
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
+            ctx.imageSmoothingQuality = "high";
+            const h = img.naturalHeight;
+            ctx.drawImage(img, 0, h * 0.85, img.naturalWidth, h * 0.15, 0, 0, canvas.width, rows);
+            const data = ctx.getImageData(0, 0, canvas.width, rows).data;
+
+            const lumas = new Array(LUMA_BUCKETS).fill(0);
+            for (let y = 0; y < rows; y++) {
+              for (let x = 0; x < canvas.width; x++) {
+                const i = (y * canvas.width + x) * 4;
+                lumas[Math.floor(x / perBucket)] += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+              }
+            }
+            resolve(lumas.map((sum) => sum / (rows * perBucket)));
+          } catch (err) {
+            resolve(null); // Pages opened from file:// cannot read pixels
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+    return bottomLumaCache[src];
+  }
+
+  // Black logo over bright areas, white logo over dark ones (white when unknown)
+  function updateLogoTone(overlay, leftPct) {
+    const logo = overlay.querySelector(".pass-logo");
+    measureBottomLuma(overlay.dataset.src).then((lumas) => {
+      let luma = 0;
+      if (lumas) {
+        const i = Math.min(LUMA_BUCKETS - 1, Math.floor((leftPct / 100) * LUMA_BUCKETS));
+        luma = (lumas[i] + lumas[Math.min(LUMA_BUCKETS - 1, i + 1)]) / 2;
+      }
+      const next = luma > 0.6 ? LOGO_ON_LIGHT : LOGO_ON_DARK;
+      if (logo.getAttribute("src") !== next) logo.src = next;
+    });
+  }
+
+  // Description (top-left) and OSL Studio logo (bottom-left) laid over one image
+  function createPassOverlay(layer) {
+    const overlay = document.createElement("div");
+    overlay.className = "pass-overlay";
+    overlay.dataset.src = layer.src;
+
+    const caption = document.createElement("div");
+    caption.className = "pass-caption";
+    caption.dataset.layer = layer.id;
+    caption.dir = "auto";
+    caption.textContent = layer.description;
+    caption.hidden = !layer.description;
+
+    const logo = document.createElement("img");
+    logo.className = "pass-logo";
+    logo.alt = "OSL Studio";
+
+    overlay.append(caption, logo);
+    updateLogoTone(overlay, 0);
+    return overlay;
   }
 
   function updateLayerDescription(layer, text) {
@@ -459,13 +526,10 @@ document.addEventListener("DOMContentLoaded", () => {
     currentFolder.descriptions = descriptions;
     saveFolderDraft(currentFolder, "descriptions", descriptions);
 
-    // Stage captions and matrix cells update live while typing
-    ["stack-description", "matrix-description"].forEach((className) => {
-      const el = document.getElementById(`${className}-${layer.id}`);
-      if (el) {
-        el.textContent = layer.description;
-        el.hidden = !layer.description;
-      }
+    // Stage and matrix captions update live while typing
+    document.querySelectorAll(`.pass-caption[data-layer="${layer.id}"]`).forEach((el) => {
+      el.textContent = layer.description;
+      el.hidden = !layer.description;
     });
   }
 
@@ -549,7 +613,7 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.style.zIndex = (idx + 1).toString();
       layerEl.style.opacity = "1";
       layerEl.innerHTML = `<img src="${layer.src}" alt="${layer.name}" />`;
-      layerEl.appendChild(createDescriptionEl("div", "stack-description", layer));
+      layerEl.appendChild(createPassOverlay(layer));
       multiCanvas.appendChild(layerEl);
     });
 
@@ -616,11 +680,12 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.style.display = "block";
       layerEl.style.mixBlendMode = "normal";
 
-      // Keep the caption inside its own slice
-      const caption = layerEl.querySelector(".stack-description");
-      if (caption) {
-        caption.style.left = `${left}%`;
-        caption.style.width = `${right - left}%`;
+      // Keep the caption and logo inside their own slice
+      const overlay = layerEl.querySelector(".pass-overlay");
+      if (overlay) {
+        overlay.style.left = `${left}%`;
+        overlay.style.width = `${right - left}%`;
+        updateLogoTone(overlay, left);
       }
     });
 
@@ -785,10 +850,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const layerEl = document.getElementById(`stack-layer-${l.id}`);
       if (layerEl) {
         layerEl.style.clipPath = "none";
-        const caption = layerEl.querySelector(".stack-description");
-        if (caption) {
-          caption.style.left = "";
-          caption.style.width = "";
+        const overlay = layerEl.querySelector(".pass-overlay");
+        if (overlay) {
+          overlay.style.left = "";
+          overlay.style.width = "";
+          updateLogoTone(overlay, 0);
         }
       }
     });
@@ -812,15 +878,15 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderMultiLayers() {
     if (multiMode === "curtain") return;
 
-    // Stacked layers would pile their captions up, so only the top visible one shows
+    // Stacked layers would pile their overlays up, so only the top visible one shows
     const topLayer = activeLayers.filter((l) => l.visible).pop();
 
     activeLayers.forEach((layer) => {
       const layerEl = document.getElementById(`stack-layer-${layer.id}`);
       if (!layerEl) return;
 
-      const caption = layerEl.querySelector(".stack-description");
-      if (caption) caption.classList.toggle("covered", activeSoloIndex === null && layer !== topLayer);
+      const overlay = layerEl.querySelector(".pass-overlay");
+      if (overlay) overlay.classList.toggle("covered", activeSoloIndex === null && layer !== topLayer);
 
       if (activeSoloIndex !== null) {
         if (layer.id === activeSoloIndex) {
@@ -965,7 +1031,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
         </div>
       `;
-      cell.appendChild(createDescriptionEl("p", "matrix-description", layer));
+      cell.querySelector(".matrix-thumb-wrap").appendChild(createPassOverlay(layer));
 
       cell.querySelector(".matrix-solo-btn").addEventListener("click", () => {
         setMultiMode("mixer");
@@ -1036,9 +1102,9 @@ document.addEventListener("DOMContentLoaded", () => {
       layerEl.style.display = "block";
       layerEl.style.mixBlendMode = "normal";
 
-      // The crossfade below already fades each caption with its layer
-      const caption = layerEl.querySelector(".stack-description");
-      if (caption) caption.classList.remove("covered");
+      // The crossfade below already fades each overlay with its layer
+      const overlay = layerEl.querySelector(".pass-overlay");
+      if (overlay) overlay.classList.remove("covered");
 
       if (idx === baseIndex) {
         layerEl.style.opacity = (1 - fraction).toFixed(3);

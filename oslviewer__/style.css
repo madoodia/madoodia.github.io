@@ -1318,9 +1318,8 @@ main {
   gap: 1.5rem;
 }
 
-.footer-brand h4 {
+.footer-brand h2 {
   font-family: var(--font-display);
-  font-size: 1.15rem;
   color: #fff;
 }
 
@@ -1647,8 +1646,9 @@ main {
   text-overflow: ellipsis;
 }
 
-/* In curtain view, hide the global top-left pill so it doesn't overlap slice labels */
-.multi-stage-card.view-curtain #multi-active-pill {
+/* In curtain and matrix views, hide the global top-left pill so it doesn't overlap slice labels */
+.multi-stage-card.view-curtain #multi-active-pill,
+.multi-stage-card.view-matrix #multi-active-pill {
   display: none;
 }
 
@@ -2612,40 +2612,78 @@ main {
   color: var(--text-dim);
 }
 
-/* Pass Descriptions: Captions on the Stage & Matrix */
-.stack-description {
+/* Pass Overlays: description top-left, OSL Studio logo bottom-left of each image */
+.pass-overlay {
   position: absolute;
-  left: 0;
+  top: 0;
   bottom: 0;
+  left: 0;
   width: 100%;
-  max-height: 45%;
   overflow: hidden;
-  padding: 0.5rem 0.75rem;
-  background: rgba(5, 6, 11, 0.78);
-  color: var(--text-main);
-  font-size: 0.82rem;
-  line-height: 1.4;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
+  pointer-events: none;
 }
 
-.multi-stage-card:not(.view-curtain) .stack-description.covered {
+.multi-stage-card:not(.view-curtain) .stack-layer .pass-overlay.covered {
   display: none;
 }
 
-.matrix-description {
-  padding: 0 0.85rem 0.7rem;
-  color: var(--text-muted);
-  font-size: 0.78rem;
+.pass-caption {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  max-width: calc(100% - 1.8rem);
+  max-height: 45%;
+  overflow: hidden;
+  padding: 0.45rem 0.7rem;
+  border-left: 2px solid var(--accent-cyan);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: rgba(5, 6, 11, 0.72);
+  color: #fff;
+  font-family: "Tomorrow", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
   line-height: 1.4;
   white-space: pre-line;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
-.stack-description[hidden],
-.matrix-description[hidden],
-.hide-descriptions .stack-description,
-.hide-descriptions .matrix-description {
+/* Clear the mode pill (mixer) and the pass number badge (matrix) */
+.multi-stage-card:not(.view-curtain) .stack-layer .pass-caption {
+  top: 3.6rem;
+}
+
+.matrix-thumb-wrap .pass-caption {
+  top: 2.1rem;
+  left: 0.5rem;
+  max-width: calc(100% - 1rem);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+/* Scoped under .pass-overlay to beat the full-size .stack-layer img / .matrix-thumb-wrap img rules */
+.pass-overlay .pass-logo {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.9rem;
+  width: 130px;
+  max-width: calc(100% - 1.8rem);
+  height: auto;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.pass-overlay .pass-logo:not([src]) {
+  visibility: hidden;
+}
+
+.matrix-thumb-wrap .pass-overlay .pass-logo {
+  left: 0.5rem;
+  bottom: 0.5rem;
+  width: 72px;
+}
+
+.pass-caption[hidden],
+.hide-descriptions .pass-caption {
   display: none;
 }
 
