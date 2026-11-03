@@ -2,6 +2,26 @@
   "project": "OSL Studio",
   "folders": [
     {
+      "id": "Cinematic_Shots",
+      "title": "Cinematic_Shots",
+      "files": [
+        "01.flat.png",
+        "02.flat.png",
+        "03.render.depth.png",
+        "04.render.png",
+        "05.dof.debug.png",
+        "06.render.post.png",
+        "07.render.post.png",
+        "08.render.post.png",
+        "09.render.post.png",
+        "10.render.post.png",
+        "11.render.post.png",
+        "12.render.post.png",
+        "13.render.post.png",
+        "14.render.post.png"
+      ]
+    },
+    {
       "id": "Viewport01",
       "title": "Viewport 01",
       "files": [

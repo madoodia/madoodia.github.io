@@ -12,6 +12,26 @@ document.addEventListener("DOMContentLoaded", () => {
     "project": "OSL Studio",
     "folders": [
       {
+        "id": "Cinematic_Shots",
+        "title": "Cinematic_Shots",
+        "files": [
+          "01.flat.png",
+          "02.flat.png",
+          "03.render.depth.png",
+          "04.render.png",
+          "05.dof.debug.png",
+          "06.render.post.png",
+          "07.render.post.png",
+          "08.render.post.png",
+          "09.render.post.png",
+          "10.render.post.png",
+          "11.render.post.png",
+          "12.render.post.png",
+          "13.render.post.png",
+          "14.render.post.png"
+        ]
+      },
+      {
         "id": "Viewport01",
         "title": "Viewport 01",
         "files": [
@@ -95,6 +115,83 @@ document.addEventListener("DOMContentLoaded", () => {
   const curtainChipsContainer = document.getElementById("curtain-chips-container");
   const btnCurtainSelectAll = document.getElementById("btn-curtain-select-all");
   const btnCurtainSelectAB = document.getElementById("btn-curtain-select-ab");
+  const btnCurtainResetOrder = document.getElementById("btn-curtain-reset-order");
+
+  // DOM Elements - Pass Descriptions
+  const btnToggleDescriptions = document.getElementById("btn-toggle-descriptions");
+  const btnEditDescriptions = document.getElementById("btn-edit-descriptions");
+  const btnDownloadManifest = document.getElementById("btn-download-manifest");
+  const descriptionEditor = document.getElementById("pass-description-editor");
+  const descriptionEditorList = document.getElementById("description-editor-list");
+
+  // Drag and Drop State for Pass Chips Reordering
+  let draggedLayerId = null;
+  let isDraggingChip = false;
+  let dragJustEnded = false;
+
+  // ==========================================================================
+  // 1b. Local Drafts: pass order & descriptions saved in this browser
+  // ==========================================================================
+  const DRAFTS_KEY = "oslviewer.drafts.v1";
+  const SHOW_DESCRIPTIONS_KEY = "oslviewer.showDescriptions.v1";
+
+  // Editing is for the author: local copies, or the live page opened with ?edit
+  const canEditDescriptions =
+    location.protocol === "file:" ||
+    ["localhost", "127.0.0.1"].includes(location.hostname) ||
+    new URLSearchParams(location.search).has("edit");
+
+  let showDescriptions = readStorage(SHOW_DESCRIPTIONS_KEY, true) !== false;
+
+  function readStorage(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw === null ? fallback : JSON.parse(raw);
+    } catch (err) {
+      return fallback;
+    }
+  }
+
+  function writeStorage(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {}
+  }
+
+  function saveFolderDraft(folder, field, value) {
+    const drafts = readStorage(DRAFTS_KEY, {});
+    drafts[folder.id] = { ...drafts[folder.id], [field]: value };
+    writeStorage(DRAFTS_KEY, drafts);
+  }
+
+  function descriptionsKey(descriptions) {
+    return JSON.stringify(Object.entries(descriptions || {}).sort());
+  }
+
+  // Layer saved drafts over the manifest. A draft that now matches the manifest has
+  // been published, so it is dropped and later manifest changes are not masked by it.
+  function applyDrafts() {
+    const drafts = readStorage(DRAFTS_KEY, {});
+    foldersList.forEach((folder) => {
+      const draft = drafts[folder.id];
+      if (!draft) return;
+
+      if (draft.order) {
+        const kept = draft.order.filter((f) => folder.files.includes(f));
+        const merged = kept.concat(folder.files.filter((f) => !kept.includes(f)));
+        if (merged.join("\n") === folder.files.join("\n")) delete draft.order;
+        else folder.files = merged;
+      }
+
+      if (draft.descriptions) {
+        if (descriptionsKey(draft.descriptions) === descriptionsKey(folder.descriptions)) delete draft.descriptions;
+        else folder.descriptions = draft.descriptions;
+      }
+
+      if (Object.keys(draft).length === 0) delete drafts[folder.id];
+    });
+    writeStorage(DRAFTS_KEY, drafts);
+  }
 
   // ==========================================================================
   // 2. Folder Slides Navigation (Point 2)
@@ -124,7 +221,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Parse layers for this folder
     folderLayers = currentFolder.files.map((file, i) => parseLayerFile(currentFolder.id, file, i));
-    
+    folderLayers.forEach((layer) => {
+      layer.description = (currentFolder.descriptions || {})[layer.filename] || "";
+    });
+
     // Default selection: all layers in folder
     selectedLayerIds = folderLayers.map(l => l.id);
     activeLayers = folderLayers.slice();
@@ -132,6 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderFolderPills();
     renderPassSelectorChips();
+    renderDescriptionEditor();
     buildMultiCanvasDOM();
     buildScrubberDOM();
     setMultiMode(multiMode);
@@ -146,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================================================================
-  // 3. Dynamic Pass Chooser for Multi-Curtain (Point 5)
+  // 3. Dynamic Pass Chooser for Multi-Curtain (Drag & Drop Reordering)
   // ==========================================================================
   function renderPassSelectorChips() {
     if (!curtainChipsContainer) return;
@@ -157,14 +258,122 @@ document.addEventListener("DOMContentLoaded", () => {
       const chip = document.createElement("button");
       chip.type = "button";
       chip.className = `pass-chip ${isSelected ? "selected" : ""}`;
-      chip.title = `Toggle Pass ${layer.num}: ${layer.name}`;
+      chip.title = `Toggle Pass ${layer.num}: ${layer.name} (Drag to reorder sequence)`;
+      chip.setAttribute("draggable", "true");
+      chip.setAttribute("data-id", layer.id);
+
       chip.innerHTML = `
+        <span class="chip-drag-handle" title="Drag to reorder pass"><i class="fa-solid fa-grip-vertical"></i></span>
         <span class="chip-check"><i class="fa-solid ${isSelected ? "fa-check" : "fa-plus"}"></i></span>
         <span class="chip-num">${layer.num}</span>
         <span class="chip-name">${layer.name}</span>
       `;
-      chip.addEventListener("click", () => togglePassSelection(layer.id));
+
+      // Drag and Drop Event Handlers
+      chip.addEventListener("dragstart", (e) => {
+        draggedLayerId = layer.id;
+        isDraggingChip = true;
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", layer.id.toString());
+        chip.classList.add("dragging");
+      });
+
+      chip.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = "move";
+        if (draggedLayerId === layer.id) {
+          chip.classList.remove("drag-over-left", "drag-over-right");
+          return;
+        }
+        const rect = chip.getBoundingClientRect();
+        const isRight = (e.clientX - rect.left) > rect.width / 2;
+        chip.classList.toggle("drag-over-left", !isRight);
+        chip.classList.toggle("drag-over-right", isRight);
+      });
+
+      chip.addEventListener("dragleave", () => {
+        chip.classList.remove("drag-over-left", "drag-over-right");
+      });
+
+      chip.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        chip.classList.remove("drag-over-left", "drag-over-right");
+        if (draggedLayerId === null || draggedLayerId === layer.id) return;
+
+        const srcIdx = folderLayers.findIndex((l) => l.id === draggedLayerId);
+        if (srcIdx < 0) return;
+
+        const rect = chip.getBoundingClientRect();
+        const isRight = (e.clientX - rect.left) > rect.width / 2;
+
+        const [movedItem] = folderLayers.splice(srcIdx, 1);
+        let tgtIdx = folderLayers.findIndex((l) => l.id === layer.id);
+        if (isRight) tgtIdx += 1;
+        folderLayers.splice(tgtIdx, 0, movedItem);
+
+        applyPassOrder();
+      });
+
+      chip.addEventListener("dragend", () => {
+        chip.classList.remove("dragging");
+        if (curtainChipsContainer) {
+          curtainChipsContainer.querySelectorAll(".pass-chip").forEach((c) => {
+            c.classList.remove("drag-over-left", "drag-over-right", "dragging");
+          });
+        }
+        dragJustEnded = true;
+        setTimeout(() => {
+          dragJustEnded = false;
+          isDraggingChip = false;
+          draggedLayerId = null;
+        }, 120);
+      });
+
+      chip.addEventListener("click", () => {
+        if (dragJustEnded || isDraggingChip) return;
+        togglePassSelection(layer.id);
+      });
+
       curtainChipsContainer.appendChild(chip);
+    });
+  }
+
+  // Rebuild every view from folderLayers and remember the order for this folder
+  function applyPassOrder() {
+    activeLayers = folderLayers.filter((l) => selectedLayerIds.includes(l.id));
+    currentFolder.files = folderLayers.map((l) => l.filename);
+    saveFolderDraft(currentFolder, "order", currentFolder.files);
+
+    renderPassSelectorChips();
+    renderDescriptionEditor();
+    buildMultiCanvasDOM();
+    buildScrubberDOM();
+
+    if (multiMode === "curtain") {
+      setupMultiCurtain();
+    } else {
+      renderMultiLayers();
+    }
+  }
+
+  // Handle dropping onto container empty space (moves dragged chip to the end)
+  if (curtainChipsContainer) {
+    curtainChipsContainer.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+    curtainChipsContainer.addEventListener("drop", (e) => {
+      if (e.target === curtainChipsContainer && draggedLayerId !== null) {
+        e.preventDefault();
+        const srcIdx = folderLayers.findIndex((l) => l.id === draggedLayerId);
+        if (srcIdx >= 0) {
+          const [movedItem] = folderLayers.splice(srcIdx, 1);
+          folderLayers.push(movedItem);
+          applyPassOrder();
+        }
+      }
     });
   }
 
@@ -178,9 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedLayerIds.push(layerId);
     }
 
-    // Keep selected passes strictly sorted in ascending order from left to right
-    selectedLayerIds.sort((a, b) => a - b);
-    activeLayers = folderLayers.filter(l => selectedLayerIds.includes(l.id));
+    // Preserve the user-defined order of folderLayers from left to right
+    activeLayers = folderLayers.filter((l) => selectedLayerIds.includes(l.id));
 
     renderPassSelectorChips();
     buildMultiCanvasDOM();
@@ -195,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnCurtainSelectAll) {
     btnCurtainSelectAll.addEventListener("click", () => {
-      selectedLayerIds = folderLayers.map(l => l.id);
+      selectedLayerIds = folderLayers.map((l) => l.id);
       activeLayers = folderLayers.slice();
       renderPassSelectorChips();
       buildMultiCanvasDOM();
@@ -212,12 +420,118 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         selectedLayerIds = [folderLayers[0].id];
       }
-      activeLayers = folderLayers.filter(l => selectedLayerIds.includes(l.id));
+      activeLayers = folderLayers.filter((l) => selectedLayerIds.includes(l.id));
       renderPassSelectorChips();
       buildMultiCanvasDOM();
       buildScrubberDOM();
       if (multiMode === "curtain") setupMultiCurtain();
       else renderMultiLayers();
+    });
+  }
+
+  if (btnCurtainResetOrder) {
+    btnCurtainResetOrder.addEventListener("click", () => {
+      // Restore default numerical sequence (01, 02, 03, ...) from the filenames
+      folderLayers.sort((a, b) => a.filename.localeCompare(b.filename, undefined, { numeric: true }));
+      applyPassOrder();
+    });
+  }
+
+  // ==========================================================================
+  // 3b. Pass Descriptions (Editor, Show/Hide Toggle, Manifest Export)
+  // ==========================================================================
+  function createDescriptionEl(tagName, className, layer) {
+    const el = document.createElement(tagName);
+    el.className = className;
+    el.id = `${className}-${layer.id}`;
+    el.dir = "auto";
+    el.textContent = layer.description;
+    el.hidden = !layer.description;
+    return el;
+  }
+
+  function updateLayerDescription(layer, text) {
+    layer.description = text.trim();
+
+    const descriptions = { ...currentFolder.descriptions };
+    if (layer.description) descriptions[layer.filename] = layer.description;
+    else delete descriptions[layer.filename];
+    currentFolder.descriptions = descriptions;
+    saveFolderDraft(currentFolder, "descriptions", descriptions);
+
+    // Stage captions and matrix cells update live while typing
+    ["stack-description", "matrix-description"].forEach((className) => {
+      const el = document.getElementById(`${className}-${layer.id}`);
+      if (el) {
+        el.textContent = layer.description;
+        el.hidden = !layer.description;
+      }
+    });
+  }
+
+  function renderDescriptionEditor() {
+    if (!descriptionEditorList) return;
+    descriptionEditorList.innerHTML = "";
+
+    folderLayers.forEach((layer) => {
+      const row = document.createElement("label");
+      row.className = "description-row";
+
+      const heading = document.createElement("span");
+      heading.className = "description-row-heading";
+      const num = document.createElement("span");
+      num.className = "description-row-num";
+      num.textContent = layer.num;
+      heading.append(num, ` ${layer.name}`);
+
+      const input = document.createElement("textarea");
+      input.className = "description-input";
+      input.rows = 2;
+      input.dir = "auto";
+      input.placeholder = "Describe this pass...";
+      input.value = layer.description;
+      input.addEventListener("input", () => updateLayerDescription(layer, input.value));
+
+      row.append(heading, input);
+      descriptionEditorList.appendChild(row);
+    });
+  }
+
+  function syncDescriptionToggle() {
+    if (multiStageCard) multiStageCard.classList.toggle("hide-descriptions", !showDescriptions);
+    if (!btnToggleDescriptions) return;
+    btnToggleDescriptions.classList.toggle("active", showDescriptions);
+    btnToggleDescriptions.setAttribute("aria-pressed", showDescriptions.toString());
+    btnToggleDescriptions.innerHTML = `<i class="fa-regular ${showDescriptions ? "fa-eye" : "fa-eye-slash"}"></i> Descriptions: ${showDescriptions ? "On" : "Off"}`;
+  }
+
+  if (btnToggleDescriptions) {
+    btnToggleDescriptions.addEventListener("click", () => {
+      showDescriptions = !showDescriptions;
+      writeStorage(SHOW_DESCRIPTIONS_KEY, showDescriptions);
+      syncDescriptionToggle();
+    });
+  }
+  syncDescriptionToggle();
+
+  if (btnEditDescriptions) {
+    btnEditDescriptions.hidden = !canEditDescriptions;
+    btnEditDescriptions.addEventListener("click", () => {
+      descriptionEditor.hidden = !descriptionEditor.hidden;
+      btnEditDescriptions.classList.toggle("active", !descriptionEditor.hidden);
+      btnEditDescriptions.setAttribute("aria-expanded", (!descriptionEditor.hidden).toString());
+    });
+  }
+
+  if (btnDownloadManifest) {
+    btnDownloadManifest.addEventListener("click", () => {
+      const manifest = { ...DEFAULT_MANIFEST, folders: foldersList };
+      const blob = new Blob([JSON.stringify(manifest, null, 2) + "\n"], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "manifest.json";
+      link.click();
+      URL.revokeObjectURL(link.href);
     });
   }
 
@@ -228,21 +542,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!multiCanvas) return;
     multiCanvas.innerHTML = "";
 
-    activeLayers.forEach((layer) => {
+    activeLayers.forEach((layer, idx) => {
       const layerEl = document.createElement("div");
       layerEl.id = `stack-layer-${layer.id}`;
       layerEl.className = "stack-layer";
-      layerEl.style.zIndex = layer.id;
+      layerEl.style.zIndex = (idx + 1).toString();
       layerEl.style.opacity = "1";
-
-      // Point 1: Clean badge without duplicated names
-      layerEl.innerHTML = `
-        <img src="${layer.src}" alt="${layer.name}" />
-        <div class="slice-label-badge">
-          <span class="badge-render-num">${layer.num}</span>
-          <span class="badge-title-txt">${layer.name}</span>
-        </div>
-      `;
+      layerEl.innerHTML = `<img src="${layer.src}" alt="${layer.name}" />`;
+      layerEl.appendChild(createDescriptionEl("div", "stack-description", layer));
       multiCanvas.appendChild(layerEl);
     });
 
@@ -293,12 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
         layerEl.style.clipPath = "none";
         layerEl.style.opacity = "1";
         layerEl.style.display = "block";
-        const badge = layerEl.querySelector(".slice-label-badge");
-        if (badge) {
-          badge.style.left = "calc(0% + 14px)";
-          badge.style.maxWidth = "calc(100% - 28px)";
-          badge.style.opacity = "1";
-        }
       }
       return;
     }
@@ -309,19 +610,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const left = (idx === 0) ? 0 : curtainPositions[idx - 1];
       const right = (idx === count - 1) ? 100 : curtainPositions[idx];
-      const sliceWidth = Math.max(0, right - left);
 
       layerEl.style.clipPath = `polygon(${left}% 0%, ${right}% 0%, ${right}% 100%, ${left}% 100%)`;
       layerEl.style.opacity = "1";
       layerEl.style.display = "block";
       layerEl.style.mixBlendMode = "normal";
 
-      // Dynamically position and mask badge within slice bounds
-      const badge = layerEl.querySelector(".slice-label-badge");
-      if (badge) {
-        badge.style.left = `calc(${left}% + 10px)`;
-        badge.style.maxWidth = `calc(${sliceWidth}% - 16px)`;
-        badge.style.opacity = (sliceWidth < 3.5) ? "0" : "1";
+      // Keep the caption inside its own slice
+      const caption = layerEl.querySelector(".stack-description");
+      if (caption) {
+        caption.style.left = `${left}%`;
+        caption.style.width = `${right - left}%`;
       }
     });
 
@@ -486,11 +785,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const layerEl = document.getElementById(`stack-layer-${l.id}`);
       if (layerEl) {
         layerEl.style.clipPath = "none";
-        const badge = layerEl.querySelector(".slice-label-badge");
-        if (badge) {
-          badge.style.left = "";
-          badge.style.maxWidth = "";
-          badge.style.opacity = "";
+        const caption = layerEl.querySelector(".stack-description");
+        if (caption) {
+          caption.style.left = "";
+          caption.style.width = "";
         }
       }
     });
@@ -513,9 +811,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Apply Layer State in Composite Mixer Mode
   function renderMultiLayers() {
     if (multiMode === "curtain") return;
+
+    // Stacked layers would pile their captions up, so only the top visible one shows
+    const topLayer = activeLayers.filter((l) => l.visible).pop();
+
     activeLayers.forEach((layer) => {
       const layerEl = document.getElementById(`stack-layer-${layer.id}`);
       if (!layerEl) return;
+
+      const caption = layerEl.querySelector(".stack-description");
+      if (caption) caption.classList.toggle("covered", activeSoloIndex === null && layer !== topLayer);
 
       if (activeSoloIndex !== null) {
         if (layer.id === activeSoloIndex) {
@@ -660,6 +965,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </button>
         </div>
       `;
+      cell.appendChild(createDescriptionEl("p", "matrix-description", layer));
 
       cell.querySelector(".matrix-solo-btn").addEventListener("click", () => {
         setMultiMode("mixer");
@@ -729,6 +1035,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!layerEl) return;
       layerEl.style.display = "block";
       layerEl.style.mixBlendMode = "normal";
+
+      // The crossfade below already fades each caption with its layer
+      const caption = layerEl.querySelector(".stack-description");
+      if (caption) caption.classList.remove("covered");
 
       if (idx === baseIndex) {
         layerEl.style.opacity = (1 - fraction).toFixed(3);
@@ -929,6 +1239,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 8. Keyboard Shortcuts
   // ==========================================================================
   window.addEventListener("keydown", (e) => {
+    // Typing a description or a pass name must not trigger shortcuts
+    if (e.target.closest && e.target.closest('textarea, input[type="text"]')) return;
+
     // Digits 1-9 solo active layers
     if (e.key >= "1" && e.key <= "9") {
       const num = parseInt(e.key, 10);
@@ -956,11 +1269,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data && data.folders && data.folders.length > 0) {
         foldersList = data.folders;
       }
+      applyDrafts();
       switchFolder(0);
     })
     .catch(() => {
       // Offline / file:// protocol fallback
       foldersList = DEFAULT_MANIFEST.folders;
+      applyDrafts();
       switchFolder(0);
     });
 });

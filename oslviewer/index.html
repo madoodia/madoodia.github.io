@@ -7,7 +7,7 @@
   <meta name="author" content="Reza Aarabi">
   <meta name="theme-color" content="#07080f">
 
-  <title>OSL Studio | Advanced Shader LookDev &amp; Multi-Pass Inspection</title>
+  <title>OSL Studio | Advanced Shader LookDev Playground &amp; Multi-Pass Inspection &amp; Post-Processing Effects</title>
 
   <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +47,6 @@
       <nav>
         <ul class="nav-links">
           <li><a href="#multi-stack"><i class="fa-solid fa-layer-group"></i> Multi-Pass Stack</a></li>
-          <li><a href="#custom-tester"><i class="fa-solid fa-sliders"></i> Test Local Renders</a></li>
           <li><a href="#specifications"><i class="fa-solid fa-microchip"></i> Architecture &amp; Tech</a></li>
         </ul>
       </nav>
@@ -111,35 +110,11 @@
         </div>
       </div>
 
-      <!-- Multi-Toolbar: View Switcher (Multi-Curtain First, Point 5) -->
-      <div class="multi-toolbar">
-        <div class="multi-view-tabs">
-          <button type="button" class="multi-view-btn active" data-multimode="curtain" title="Interactive multi-wipe vertical dividers">
-            <i class="fa-solid fa-table-columns"></i> Multi-Curtain Wipe
-          </button>
-          <button type="button" class="multi-view-btn" data-multimode="mixer" title="Photoshop/Nuke style layer composite stack">
-            <i class="fa-solid fa-sliders"></i> Composite Mixer
-          </button>
-          <button type="button" class="multi-view-btn" data-multimode="matrix" title="Side-by-side grid of all active passes">
-            <i class="fa-solid fa-table-cells"></i> Synchronized Matrix
-          </button>
-        </div>
-
-        <div class="playback-controls">
-          <button type="button" id="btn-equalize-curtain" class="cycle-btn" title="Reset curtain slices to equal width">
-            <i class="fa-solid fa-arrows-left-right"></i> Equalize Slices
-          </button>
-          <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through passes in sequence">
-            <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
-          </button>
-        </div>
-      </div>
-
       <!-- Dynamic Pass Chooser for Multi-Curtain Wipe (Point 5) -->
       <div class="curtain-pass-selector-bar" id="curtain-pass-selector-bar">
         <div class="selector-label-group">
           <span class="selector-title"><i class="fa-solid fa-filter"></i> Passes in Curtain:</span>
-          <span class="selector-sub">Toggle passes to compare 1, 2, or more layers from left to right</span>
+          <span class="selector-sub">Toggle passes to compare &bull; Drag &amp; drop chips to reorder layers from left to right</span>
         </div>
         <div class="selector-chips-container" id="curtain-chips-container">
           <!-- Dynamically populated toggle chips for active folder -->
@@ -151,6 +126,26 @@
           <button type="button" class="selector-action-btn" id="btn-curtain-select-ab" title="Compare first and last passes">
             <i class="fa-solid fa-arrows-split-up-and-left"></i> A/B Ends
           </button>
+          <button type="button" class="selector-action-btn" id="btn-curtain-reset-order" title="Reset passes back to original sequence (01, 02, ...)">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Reset Order
+          </button>
+          <button type="button" class="selector-action-btn" id="btn-toggle-descriptions" title="Show or hide pass descriptions on the images" aria-pressed="true">
+            <i class="fa-regular fa-eye"></i> Descriptions: On
+          </button>
+          <button type="button" class="selector-action-btn" id="btn-edit-descriptions" title="Write a description for each pass" aria-expanded="false" aria-controls="pass-description-editor" hidden>
+            <i class="fa-solid fa-pen"></i> Edit Descriptions
+          </button>
+        </div>
+        <div class="pass-description-editor" id="pass-description-editor" hidden>
+          <div class="description-editor-list" id="description-editor-list">
+            <!-- Dynamically populated with one text box per pass -->
+          </div>
+          <div class="description-editor-footer">
+            <span>Edits and pass order save in this browser only. To publish them, download the manifest and replace <code>images/oslviewer/manifest.json</code>.</span>
+            <button type="button" class="selector-action-btn" id="btn-download-manifest" title="Download manifest.json with the current order and descriptions">
+              <i class="fa-solid fa-download"></i> Download manifest.json
+            </button>
+          </div>
         </div>
       </div>
 
@@ -183,6 +178,32 @@
               <!-- Populated dynamically by viewer.js -->
             </div>
           </div>
+        </div>
+      </div>
+      
+      <!-- Multi-Toolbar: View Switcher (Multi-Curtain First, Point 5) -->
+      <div class="multi-toolbar">
+        <div class="multi-view-tabs">
+          <button type="button" class="multi-view-btn active" data-multimode="curtain"
+            title="Interactive multi-wipe vertical dividers">
+            <i class="fa-solid fa-table-columns"></i> Multi-Curtain Wipe
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="mixer"
+            title="Photoshop/Nuke style layer composite stack">
+            <i class="fa-solid fa-sliders"></i> Composite Mixer
+          </button>
+          <button type="button" class="multi-view-btn" data-multimode="matrix" title="Side-by-side grid of all active passes">
+            <i class="fa-solid fa-table-cells"></i> Synchronized Matrix
+          </button>
+        </div>
+      
+        <div class="playback-controls">
+          <button type="button" id="btn-equalize-curtain" class="cycle-btn" title="Reset curtain slices to equal width">
+            <i class="fa-solid fa-arrows-left-right"></i> Equalize Slices
+          </button>
+          <button type="button" id="btn-auto-cycle" class="cycle-btn" title="Automatically cycle through passes in sequence">
+            <i class="fa-solid fa-play"></i> Auto-Cycle Turntable
+          </button>
         </div>
       </div>
 
@@ -222,96 +243,6 @@
           <button type="button" class="quick-pct-btn" data-pct="100">100%</button>
         </div>
       </div>
-
-      <!-- Controls Toolbar -->
-      <div class="comparator-toolbar">
-        <div class="toolbar-group">
-          <button type="button" class="mode-btn active" data-local-mode="split" title="Split Screen Wipe">
-            <i class="fa-solid fa-arrows-split-up-and-left"></i> Split Wipe
-          </button>
-          <button type="button" class="mode-btn" data-local-mode="difference" title="Highlight exact pixel differences">
-            <i class="fa-solid fa-bolt"></i> Difference Map
-          </button>
-          <button type="button" class="mode-btn" data-local-mode="opacity" title="Opacity Crossfade">
-            <i class="fa-solid fa-circle-half-stroke"></i> Onion Skin
-          </button>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" id="btn-reset-local-pair" class="cycle-btn" title="Reset back to default viewport pair">
-            <i class="fa-solid fa-rotate-left"></i> Reset to Default
-          </button>
-        </div>
-      </div>
-
-      <!-- Comparison Canvas Stage -->
-      <div id="comparator-stage" class="comparator-stage">
-        <!-- Overlay Badges -->
-        <div class="badge-pill badge-before">
-          <i class="fa-solid fa-camera"></i> <span id="local-badge-before-txt">Before Pass</span>
-        </div>
-        <div class="badge-pill badge-after">
-          <i class="fa-solid fa-sparkles"></i> <span id="local-badge-after-txt">After Pass</span>
-        </div>
-
-        <!-- Diff Map Active Banner -->
-        <div class="diff-indicator-alert" id="local-diff-alert" style="display: none;">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span>Difference Mode Active: Pure black means identical pixels; bright colors indicate shader changes.</span>
-        </div>
-
-        <!-- Image Canvas -->
-        <div id="local-comparison-box" class="comparison-box">
-          <!-- Bottom Layer: After Image -->
-          <div class="layer-after" id="local-layer-after">
-            <img id="local-img-after" src="../images/oslviewer/Viewport01/06.render.dof.png" alt="After Render" />
-          </div>
-
-          <!-- Top Overlay Layer: Before Image -->
-          <div class="layer-before" id="local-layer-before">
-            <img id="local-img-before" src="../images/oslviewer/Viewport01/01.wireframe.png" alt="Before Render" />
-          </div>
-
-          <!-- Vertical Split Line -->
-          <div class="slider-bar" id="local-slider-bar" aria-hidden="true"></div>
-
-          <!-- Draggable Knob Handle -->
-          <div class="slider-knob" id="local-slider-knob" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M8.5 7l-5 5 5 5V7zm7 10l5-5-5-5v10z"/>
-            </svg>
-          </div>
-
-          <!-- Range Input Slider -->
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value="50"
-            step="0.1"
-            id="local-range-slider-input"
-            class="range-slider-input"
-            aria-label="Comparison slider percentage"
-          />
-        </div>
-
-        <!-- Local File Pickers Bar (Point 3: Click to browse, no drag and drop) -->
-        <div class="local-picker-controls-card">
-          <div class="local-picker-grid">
-            <label class="local-file-picker-btn">
-              <i class="fa-solid fa-image"></i>
-              <span id="local-file-before-label">Choose &ldquo;Before&rdquo; Render</span>
-              <input type="file" id="local-input-file-before" class="file-hidden-input" accept="image/*">
-            </label>
-            <label class="local-file-picker-btn">
-              <i class="fa-solid fa-image"></i>
-              <span id="local-file-after-label">Choose &ldquo;After&rdquo; Render</span>
-              <input type="file" id="local-input-file-after" class="file-hidden-input" accept="image/*">
-            </label>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- 3. Technical Specifications & Architecture (Point 10) -->
     <section id="specifications" class="specs-section">
@@ -541,33 +472,15 @@
   <footer class="osl-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <h4>OSL Studio &bull; Reza Aarabi</h4>
-        <p>VFX &bull; Animation &bull; Games &bull; Pipeline Automation</p>
-      </div>
-
-      <div class="footer-social-links">
-        <a class="footer-social-icon" href="https://www.linkedin.com/in/madoodia/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
-          <i class="fa-brands fa-linkedin"></i>
-        </a>
-        <a class="footer-social-icon" href="https://github.com/madoodia/" target="_blank" rel="noopener noreferrer" title="GitHub">
-          <i class="fa-brands fa-github"></i>
-        </a>
-        <a class="footer-social-icon" href="https://vimeo.com/madoodia/" target="_blank" rel="noopener noreferrer" title="Vimeo">
-          <i class="fa-brands fa-vimeo"></i>
-        </a>
-        <a class="footer-social-icon" href="https://gumroad.com/madoodia/" target="_blank" rel="noopener noreferrer" title="Gumroad">
-          <i class="fa-solid fa-worm"></i>
-        </a>
-        <a class="footer-social-icon" href="https://www.twitter.com/madoodia/" target="_blank" rel="noopener noreferrer" title="X-Twitter">
-          <i class="fa-brands fa-x-twitter"></i>
-        </a>
-        <a class="footer-social-icon" href="https://www.youtube.com/@RezaAarabi/" target="_blank" rel="noopener noreferrer" title="YouTube">
-          <i class="fa-brands fa-youtube"></i>
-        </a>
+        <h2>OSL Studio</h2>
       </div>
 
       <div class="footer-copyright">
-        &copy; 2026 madoodia.com &bull; OSL Studio &bull; All Rights Reserved
+        <h2>Reza Aarabi</h2>madoodia@gmail.com
+      </div>
+
+      <div class="footer-copyright">
+        &copy; 2026 madoodia.com &bull; All Rights Reserved
       </div>
     </div>
   </footer>

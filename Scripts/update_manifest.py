@@ -4,9 +4,11 @@ OSL Studio - Viewport Manifest & Layer Synchronizer
 Scans images/oslviewer for folders and image passes, extracts clean layer names,
 and updates both manifest.json and oslviewer/viewer.js (for offline file:/// support).
 
+Custom pass order and descriptions already in manifest.json are preserved.
+
 Usage:
-    py update_manifest.py
-    python update_manifest.py
+    py Scripts/update_manifest.py
+    python Scripts/update_manifest.py
 """
 
 import json
@@ -71,9 +73,31 @@ def scan_viewport_folders(images_dir: Path):
     return folders
 
 
+def preserve_manual_edits(folders, manifest_path: Path):
+    """Carry custom pass order and descriptions over from the existing manifest.json."""
+    if not manifest_path.exists():
+        return
+
+    existing = {f["id"]: f for f in json.loads(manifest_path.read_text(encoding="utf-8")).get("folders", [])}
+    for folder in folders:
+        previous = existing.get(folder["id"])
+        if not previous:
+            continue
+
+        files = folder["files"]
+        kept = [f for f in previous.get("files", []) if f in files]
+        # Passes in natural order stay naturally sorted, so new files slot into place
+        if kept != sorted(kept, key=natural_sort_key):
+            folder["files"] = kept + [f for f in files if f not in kept]
+
+        descriptions = {f: text for f, text in previous.get("descriptions", {}).items() if f in files and text}
+        if descriptions:
+            folder["descriptions"] = descriptions
+
+
 def update_manifest_json(manifest_path: Path, manifest_data: dict):
     """Write formatted manifest.json."""
-    content = json.dumps(manifest_data, indent=2) + "\n"
+    content = json.dumps(manifest_data, indent=2, ensure_ascii=False) + "\n"
     manifest_path.write_text(content, encoding="utf-8")
     print(f"[OK] Updated: {manifest_path.resolve()}")
 
@@ -90,7 +114,7 @@ def update_viewer_js(viewer_js_path: Path, manifest_data: dict):
     content = viewer_js_path.read_text(encoding="utf-8")
 
     # Format JavaScript object with 2-space indentation
-    manifest_json_str = json.dumps(manifest_data, indent=2)
+    manifest_json_str = json.dumps(manifest_data, indent=2, ensure_ascii=False)
     # Indent manifest for inside viewer.js function
     indented_manifest = "\n".join("  " + line if line.strip() else "" for line in manifest_json_str.splitlines())
     replacement = f"  const DEFAULT_MANIFEST = {indented_manifest.strip()};"
@@ -99,7 +123,8 @@ def update_viewer_js(viewer_js_path: Path, manifest_data: dict):
     pattern = re.compile(r"^[ \t]*const DEFAULT_MANIFEST\s*=\s*\{.*?\n[ \t]*\};", re.DOTALL | re.MULTILINE)
 
     if pattern.search(content):
-        updated_content = pattern.sub(replacement, content, count=1)
+        # A function keeps backslashes in descriptions from being read as regex escapes
+        updated_content = pattern.sub(lambda _: replacement, content, count=1)
         viewer_js_path.write_text(updated_content, encoding="utf-8")
         print(f"[OK] Synchronized DEFAULT_MANIFEST in: {viewer_js_path.resolve()}")
     else:
@@ -107,7 +132,8 @@ def update_viewer_js(viewer_js_path: Path, manifest_data: dict):
 
 
 def main():
-    repo_root = Path(__file__).resolve().parent
+    script_dir = Path(__file__).resolve().parent
+    repo_root = script_dir.parent if script_dir.name.lower() == "scripts" else script_dir
     images_dir = repo_root / "images" / "oslviewer"
     manifest_file = images_dir / "manifest.json"
     viewer_js_file = repo_root / "oslviewer" / "viewer.js"
@@ -121,6 +147,8 @@ def main():
     if not folders:
         print("[ERROR] No viewport folders with images found.")
         sys.exit(1)
+
+    preserve_manual_edits(folders, manifest_file)
 
     print(f"\nDiscovered {len(folders)} Viewport Folder(s):")
     total_images = 0
